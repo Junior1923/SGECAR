@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Sistema_de_Gestión_Empresarial_con_Control_de_Acceso_por_Roles.Data;
-using Sistema_de_Gestión_Empresarial_con_Control_de_Acceso_por_Roles.Models;
+using SGECAR.Data.Context;
+using SGECAR.Shared.Models;
 
-namespace Sistema_de_Gestión_Empresarial_con_Control_de_Acceso_por_Roles.Repositories;
+namespace SGECAR.Data.Repositories;
 
 public class PermisoRepository
 {

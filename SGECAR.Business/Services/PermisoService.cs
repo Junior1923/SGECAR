@@ -1,4 +1,4 @@
-﻿namespace Sistema_de_Gestión_Empresarial_con_Control_de_Acceso_por_Roles.Services
+﻿namespace SGECAR.Business.Services
 {
     public class PermisoService
     {

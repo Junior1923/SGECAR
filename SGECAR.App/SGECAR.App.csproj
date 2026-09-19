@@ -4,7 +4,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>Sistema_de_Gestión_Empresarial_con_Control_de_Acceso_por_Roles</RootNamespace>
+    <RootNamespace>SGECAR.App</RootNamespace>
+    <AssemblyName>SGECAR.App</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,11 +13,16 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.20" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.20">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SGECAR.Business\SGECAR.Business.csproj" />
+    <ProjectReference Include="..\SGECAR.Data\SGECAR.Data.csproj" />
+    <ProjectReference Include="..\SGECAR.Shared\SGECAR.Shared.csproj" />
   </ItemGroup>
 
 </Project>

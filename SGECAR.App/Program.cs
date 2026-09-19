@@ -1,7 +1,7 @@
 
 using Microsoft.EntityFrameworkCore;
-using Sistema_de_Gestión_Empresarial_con_Control_de_Acceso_por_Roles.Data;
-using Sistema_de_Gestión_Empresarial_con_Control_de_Acceso_por_Roles.Repositories;
+using SGECAR.Data.Context;
+using SGECAR.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
