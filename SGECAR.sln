@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.7.11819.209 insiders
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SGECAR.App", "Sistema de Gestión Empresarial con Control de Acceso por Roles\SGECAR.App.csproj", "{FDDA25B1-C256-421C-BDD1-9248B25F79F8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SGECAR.App", "SGECAR.App\SGECAR.App.csproj", "{FDDA25B1-C256-421C-BDD1-9248B25F79F8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SGECAR.API", "SGECAR.API\SGECAR.API.csproj", "{9FC96E01-D5FF-46E0-A8BA-A71912D4D232}"
 EndProject
