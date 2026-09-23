@@ -1,18 +1,19 @@
-using SGECAR.Data.Repositories;
 using SGECAR.Shared.Contracts;
+using SGECAR.Shared.Contracts.Repositories;
+using SGECAR.Shared.Contracts.Services;
 using SGECAR.Shared.Models;
 using SGECAR.Shared.Security;
 
 namespace SGECAR.Business.Services
 {
-    public class RolService
+    public class RolService : IRolService
     {
         private const int LongitudMaximaNombre = 50;
 
-        private readonly RoleRepository _roles;
-        private readonly PermisoRepository _permisos;
+        private readonly IRoleRepository _roles;
+        private readonly IPermisoRepository _permisos;
 
-        public RolService(RoleRepository roles, PermisoRepository permisos)
+        public RolService(IRoleRepository roles, IPermisoRepository permisos)
         {
             _roles = roles;
             _permisos = permisos;
@@ -21,9 +22,6 @@ namespace SGECAR.Business.Services
         public Task<List<Role>> ListRolesAsync() => _roles.ListRoles();
 
         public Task<Role?> GetRoleAsync(int rolId) => _roles.GetRoleById(rolId);
-
-        public static bool EsRolProtegido(Role role) =>
-            string.Equals(role.Nombre, RolesSistema.Administrador, StringComparison.OrdinalIgnoreCase);
 
         public async Task<OperacionResultado> CreateRoleAsync(string? nombre, IEnumerable<int> permisoIds)
         {
@@ -49,7 +47,7 @@ namespace SGECAR.Business.Services
             if (role == null)
                 return OperacionResultado.NoEncontrado("El rol no existe.");
 
-            if (EsRolProtegido(role))
+            if (RolesSistema.EsRolProtegido(role.Nombre))
                 return OperacionResultado.Conflicto($"El rol \"{role.Nombre}\" es del sistema y no se puede modificar.");
 
             var error = await ValidarNombre(nombre, rolId);
@@ -74,7 +72,7 @@ namespace SGECAR.Business.Services
             if (role == null)
                 return OperacionResultado.NoEncontrado("El rol no existe.");
 
-            if (EsRolProtegido(role))
+            if (RolesSistema.EsRolProtegido(role.Nombre))
                 return OperacionResultado.Conflicto($"El rol \"{role.Nombre}\" es del sistema y no se puede eliminar.");
 
             int usuarios = await _roles.CountUsersByRole(rolId);

@@ -1,19 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
 using SGECAR.API.Security;
-using SGECAR.Business.Services;
 using SGECAR.Shared.Contracts;
+using SGECAR.Shared.Contracts.Services;
 
 namespace SGECAR.API.Controllers
 {
     [Route("api/auth")]
     public class AuthController : ApiControllerBase
     {
-        private readonly AuthService _authService;
+        private readonly IAuthService _authService;
         private readonly SesionStore _sesionStore;
         private readonly SesionActual _sesion;
-        private readonly PermisoService _permisoService;
+        private readonly IPermisoService _permisoService;
 
-        public AuthController(AuthService authService, SesionStore sesionStore, SesionActual sesion, PermisoService permisoService)
+        public AuthController(IAuthService authService, SesionStore sesionStore, SesionActual sesion, IPermisoService permisoService)
         {
             _authService = authService;
             _sesionStore = sesionStore;

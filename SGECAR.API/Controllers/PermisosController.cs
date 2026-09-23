@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SGECAR.API.Security;
-using SGECAR.Business.Services;
 using SGECAR.Shared.Contracts;
+using SGECAR.Shared.Contracts.Services;
 using SGECAR.Shared.Security;
 
 namespace SGECAR.API.Controllers
@@ -9,11 +9,11 @@ namespace SGECAR.API.Controllers
     [Route("api/permisos")]
     public class PermisosController : ApiControllerBase
     {
-        private readonly PermisoService _permisoService;
-        private readonly RolService _rolService;
+        private readonly IPermisoService _permisoService;
+        private readonly IRolService _rolService;
         private readonly SesionStore _sesionStore;
 
-        public PermisosController(PermisoService permisoService, RolService rolService, SesionStore sesionStore)
+        public PermisosController(IPermisoService permisoService, IRolService rolService, SesionStore sesionStore)
         {
             _permisoService = permisoService;
             _rolService = rolService;

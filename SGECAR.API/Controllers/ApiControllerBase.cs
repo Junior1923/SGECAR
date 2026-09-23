@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using SGECAR.Business.Services;
 using SGECAR.Shared.Contracts;
 using SGECAR.Shared.Models;
 using SGECAR.Shared.Security;
@@ -31,14 +30,14 @@ namespace SGECAR.API.Controllers
             PermisoId = permiso.PermisoId,
             Nombre = permiso.Nombre,
             Descripcion = permiso.Descripcion,
-            EsSistema = PermisoService.EsPermisoSistema(permiso)
+            EsSistema = Acciones.EsPermisoBase(permiso.Nombre)
         };
 
         protected static RolDto ToDto(Role rol) => new()
         {
             RolId = rol.RolId,
             Nombre = rol.Nombre,
-            EsSistema = string.Equals(rol.Nombre, RolesSistema.Administrador, StringComparison.OrdinalIgnoreCase),
+            EsSistema = RolesSistema.EsRolProtegido(rol.Nombre),
             CantidadUsuarios = rol.Usuarios.Count,
             Permisos = rol.Permisos.OrderBy(p => p.PermisoId).Select(ToDto).ToList()
         };

@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using SGECAR.Data.Context;
+using SGECAR.Shared.Contracts.Repositories;
 using SGECAR.Shared.Models;
 
 namespace SGECAR.Data.Repositories;
 
-public class PermisoRepository
+public class PermisoRepository : IPermisoRepository
 {
     private readonly GestionEmpresarialContext _context;
 

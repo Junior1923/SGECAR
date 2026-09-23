@@ -1,12 +1,13 @@
 using System.Text.RegularExpressions;
-using SGECAR.Data.Repositories;
 using SGECAR.Shared.Contracts;
+using SGECAR.Shared.Contracts.Repositories;
+using SGECAR.Shared.Contracts.Services;
 using SGECAR.Shared.Models;
 using SGECAR.Shared.Security;
 
 namespace SGECAR.Business.Services
 {
-    public class PermisoService
+    public class PermisoService : IPermisoService
     {
         private const int LongitudMaximaNombre = 100;
         private const int LongitudMaximaDescripcion = 200;
@@ -14,10 +15,10 @@ namespace SGECAR.Business.Services
         // NOMBRES EN MAYÚSCULAS, NÚMEROS Y GUION BAJO (EJ. EXPORTAR_REPORTES)
         private static readonly Regex FormatoNombre = new("^[A-Z][A-Z0-9_]*$");
 
-        private readonly PermisoRepository _permisos;
-        private readonly RoleRepository _roles;
+        private readonly IPermisoRepository _permisos;
+        private readonly IRoleRepository _roles;
 
-        public PermisoService(PermisoRepository permisos, RoleRepository roles)
+        public PermisoService(IPermisoRepository permisos, IRoleRepository roles)
         {
             _permisos = permisos;
             _roles = roles;
@@ -30,10 +31,6 @@ namespace SGECAR.Business.Services
         public Task<List<Permiso>> GetPermissionsByRoleAsync(int rolId) => _permisos.GetPermissionsByRole(rolId);
 
         public Task<bool> HasPermissionAsync(int rolId, string permiso) => _permisos.HasPermission(rolId, permiso);
-
-        // LOS PERMISOS BASE SON LOS QUE USA EL CONTROL DE ACCESO; NO SE PUEDEN ELIMINAR NI RENOMBRAR
-        public static bool EsPermisoSistema(Permiso permiso) =>
-            Acciones.Todas.Contains(permiso.Nombre, StringComparer.OrdinalIgnoreCase);
 
         // CREAR PERMISO: SE ASIGNA AUTOMÁTICAMENTE AL ROL ADMINISTRADOR (QUE TIENE TODOS LOS PERMISOS)
         public async Task<OperacionResultado> CreatePermissionAsync(string? nombre, string? descripcion)
@@ -70,7 +67,7 @@ namespace SGECAR.Business.Services
 
             string nuevoNombre = Normalizar(nombre);
 
-            if (EsPermisoSistema(permiso) && nuevoNombre != permiso.Nombre)
+            if (Acciones.EsPermisoBase(permiso.Nombre) && nuevoNombre != permiso.Nombre)
                 return OperacionResultado.Conflicto($"El permiso \"{permiso.Nombre}\" es del sistema y no se puede renombrar; solo se puede cambiar su descripción.");
 
             permiso.Nombre = nuevoNombre;
@@ -89,7 +86,7 @@ namespace SGECAR.Business.Services
             if (permiso == null)
                 return OperacionResultado.NoEncontrado("El permiso no existe.");
 
-            if (EsPermisoSistema(permiso))
+            if (Acciones.EsPermisoBase(permiso.Nombre))
                 return OperacionResultado.Conflicto($"El permiso \"{permiso.Nombre}\" es del sistema y no se puede eliminar.");
 
             int roles = permiso.Rols.Count;

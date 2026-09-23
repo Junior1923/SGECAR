@@ -1,19 +1,20 @@
 using SGECAR.Business.Security;
-using SGECAR.Data.Repositories;
 using SGECAR.Shared.Contracts;
+using SGECAR.Shared.Contracts.Repositories;
+using SGECAR.Shared.Contracts.Services;
 using SGECAR.Shared.Models;
 
 namespace SGECAR.Business.Services
 {
-    public class UsuarioService
+    public class UsuarioService : IUsuarioService
     {
         private const int LongitudMaximaUsuario = 50;
         private const int LongitudMinimaContrasena = 8;
 
-        private readonly UsuarioRepository _usuarios;
-        private readonly RoleRepository _roles;
+        private readonly IUsuarioRepository _usuarios;
+        private readonly IRoleRepository _roles;
 
-        public UsuarioService(UsuarioRepository usuarios, RoleRepository roles)
+        public UsuarioService(IUsuarioRepository usuarios, IRoleRepository roles)
         {
             _usuarios = usuarios;
             _roles = roles;

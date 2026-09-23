@@ -14,6 +14,10 @@ public static class Acciones
     {
         Agregar, Modificar, Eliminar, Consultar, CrearUsuarios, CrearRoles
     };
+
+    // LOS PERMISOS BASE SON LOS QUE USA EL CONTROL DE ACCESO; NO SE PUEDEN ELIMINAR NI RENOMBRAR
+    public static bool EsPermisoBase(string nombre) =>
+        Todas.Contains(nombre, StringComparer.OrdinalIgnoreCase);
 }
 
 // ROLES DEL SISTEMA
@@ -23,4 +27,7 @@ public static class RolesSistema
     public const string Administrador = "Administrador";
     public const string Supervisor = "Supervisor";
     public const string Ejecutor = "Ejecutor";
+
+    public static bool EsRolProtegido(string nombre) =>
+        string.Equals(nombre, Administrador, StringComparison.OrdinalIgnoreCase);
 }

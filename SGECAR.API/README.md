@@ -376,8 +376,34 @@ El archivo `SGECAR.API.http` tiene peticiones de ejemplo listas para ejecutar de
 | API | `Security/SesionStore.cs` | Sesiones activas en memoria (token → usuario, rol y permisos) |
 | API | `Security/SesionActual.cs` | Sesión de la petición actual y `HasPermission(accion)` |
 | API | `Security/Filtros.cs` | `[PermitirAnonimo]`, `[RequierePermiso]`, respuestas `401` y `403` |
-| Business | `Services/AuthService.cs` | Login, intentos fallidos y bloqueo |
-| Business | `Services/RolService.cs`, `UsuarioService.cs`, `PermisoService.cs` | Reglas de negocio del CRUD |
+| Business | `Services/AuthService.cs` | Login, intentos fallidos y bloqueo (implementa `IAuthService`) |
+| Business | `Services/RolService.cs`, `UsuarioService.cs`, `PermisoService.cs` | Reglas de negocio del CRUD (implementan `IRolService`, `IUsuarioService`, `IPermisoService`) |
 | Business | `Security/PasswordHasher.cs` | Hash y verificación de contraseñas |
-| Data | `Repositories/*.cs` | Acceso a datos con Entity Framework Core |
-| Shared | `Contracts/*.cs`, `Security/Acciones.cs` | DTOs, resultados y constantes de permisos |
+| Data | `Repositories/*.cs` | Acceso a datos con Entity Framework Core (implementan `IUsuarioRepository`, `IRoleRepository`, `IPermisoRepository`) |
+| Shared | `Contracts/Services/I*Service.cs` | Interfaces de los servicios |
+| Shared | `Contracts/Repositories/I*Repository.cs` | Interfaces de los repositorios |
+| Shared | `Contracts/*.cs` | DTOs y resultados |
+| Shared | `Security/Acciones.cs` | Constantes de permisos y roles, `Acciones.EsPermisoBase()` y `RolesSistema.EsRolProtegido()` |
+
+### Inyección de dependencias
+
+Cada clase recibe sus dependencias **por interfaz**, nunca por la clase concreta:
+
+```
+Controllers ──> I*Service (Shared) <── *Service (Business) ──> I*Repository (Shared) <── *Repository (Data)
+```
+
+El registro está en `Program.cs`:
+
+```csharp
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IPermisoRepository, PermisoRepository>();
+
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<IRolService, RolService>();
+builder.Services.AddScoped<IPermisoService, PermisoService>();
+```
+
+Para un módulo nuevo: crear la interfaz en `SGECAR.Shared/Contracts`, implementarla en Business o Data, registrarla en `Program.cs` e inyectarla por la interfaz.

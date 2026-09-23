@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SGECAR.API.Security;
-using SGECAR.Business.Services;
 using SGECAR.Shared.Contracts;
+using SGECAR.Shared.Contracts.Services;
 using SGECAR.Shared.Security;
 
 namespace SGECAR.API.Controllers
@@ -10,10 +10,10 @@ namespace SGECAR.API.Controllers
     [RequierePermiso(Acciones.CrearRoles)]
     public class RolesController : ApiControllerBase
     {
-        private readonly RolService _rolService;
+        private readonly IRolService _rolService;
         private readonly SesionStore _sesionStore;
 
-        public RolesController(RolService rolService, SesionStore sesionStore)
+        public RolesController(IRolService rolService, SesionStore sesionStore)
         {
             _rolService = rolService;
             _sesionStore = sesionStore;

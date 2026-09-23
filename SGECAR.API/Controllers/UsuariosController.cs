@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SGECAR.API.Security;
-using SGECAR.Business.Services;
 using SGECAR.Shared.Contracts;
+using SGECAR.Shared.Contracts.Services;
 using SGECAR.Shared.Security;
 
 namespace SGECAR.API.Controllers
@@ -10,11 +10,11 @@ namespace SGECAR.API.Controllers
     [RequierePermiso(Acciones.CrearUsuarios)]
     public class UsuariosController : ApiControllerBase
     {
-        private readonly UsuarioService _usuarioService;
+        private readonly IUsuarioService _usuarioService;
         private readonly SesionStore _sesionStore;
         private readonly SesionActual _sesion;
 
-        public UsuariosController(UsuarioService usuarioService, SesionStore sesionStore, SesionActual sesion)
+        public UsuariosController(IUsuarioService usuarioService, SesionStore sesionStore, SesionActual sesion)
         {
             _usuarioService = usuarioService;
             _sesionStore = sesionStore;

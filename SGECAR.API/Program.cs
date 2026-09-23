@@ -4,6 +4,8 @@ using SGECAR.API.Security;
 using SGECAR.Business.Services;
 using SGECAR.Data.Context;
 using SGECAR.Data.Repositories;
+using SGECAR.Shared.Contracts.Repositories;
+using SGECAR.Shared.Contracts.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,15 +26,15 @@ builder.Services.AddSingleton<SesionStore>();
 builder.Services.AddScoped<SesionActual>();
 
 // REPOSITORIOS
-builder.Services.AddScoped<UsuarioRepository>();
-builder.Services.AddScoped<RoleRepository>();
-builder.Services.AddScoped<PermisoRepository>();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IPermisoRepository, PermisoRepository>();
 
 // SERVICIOS DE NEGOCIO
-builder.Services.AddScoped<AuthService>();
-builder.Services.AddScoped<UsuarioService>();
-builder.Services.AddScoped<RolService>();
-builder.Services.AddScoped<PermisoService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<IRolService, RolService>();
+builder.Services.AddScoped<IPermisoService, PermisoService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

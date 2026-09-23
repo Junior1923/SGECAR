@@ -1,10 +1,11 @@
 using SGECAR.Business.Security;
-using SGECAR.Data.Repositories;
 using SGECAR.Shared.Contracts;
+using SGECAR.Shared.Contracts.Repositories;
+using SGECAR.Shared.Contracts.Services;
 
 namespace SGECAR.Business.Services
 {
-    public class AuthService
+    public class AuthService : IAuthService
     {
         // COINCIDE CON CK_Usuarios_IntentosFallidos (0..3)
         public const int MaxIntentosFallidos = 3;
@@ -12,9 +13,9 @@ namespace SGECAR.Business.Services
         private const string MensajeCuentaBloqueada =
             "La cuenta está bloqueada por exceder el número de intentos permitidos. Contacte al administrador.";
 
-        private readonly UsuarioRepository _usuarios;
+        private readonly IUsuarioRepository _usuarios;
 
-        public AuthService(UsuarioRepository usuarios)
+        public AuthService(IUsuarioRepository usuarios)
         {
             _usuarios = usuarios;
         }
