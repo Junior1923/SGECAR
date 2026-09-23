@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using SGECAR.API.Security;
 using SGECAR.Business.Services;
 using SGECAR.Shared.Contracts;
-using SGECAR.Shared.Security;
 
 namespace SGECAR.API.Controllers
 {
@@ -12,12 +11,14 @@ namespace SGECAR.API.Controllers
         private readonly AuthService _authService;
         private readonly SesionStore _sesionStore;
         private readonly SesionActual _sesion;
+        private readonly PermisoService _permisoService;
 
-        public AuthController(AuthService authService, SesionStore sesionStore, SesionActual sesion)
+        public AuthController(AuthService authService, SesionStore sesionStore, SesionActual sesion, PermisoService permisoService)
         {
             _authService = authService;
             _sesionStore = sesionStore;
             _sesion = sesion;
+            _permisoService = permisoService;
         }
 
         // INICIAR SESIÓN
@@ -70,12 +71,13 @@ namespace SGECAR.API.Controllers
             return Ok(_sesion.Datos);
         }
 
-        // MAPA ACCIÓN -> PERMITIDO, PARA HABILITAR/DESHABILITAR BOTONES Y MENÚS EN EL CLIENTE
+        // MAPA ACCIÓN -> PERMITIDO (TODOS LOS PERMISOS DE LA BD), PARA HABILITAR/DESHABILITAR BOTONES Y MENÚS EN EL CLIENTE
         [HttpGet("permisos")]
         [ProducesResponseType(typeof(Dictionary<string, bool>), StatusCodes.Status200OK)]
-        public IActionResult Permisos()
+        public async Task<IActionResult> Permisos()
         {
-            return Ok(Acciones.Todas.ToDictionary(a => a, a => _sesion.HasPermission(a)));
+            var permisos = await _permisoService.ListPermissionsAsync();
+            return Ok(permisos.ToDictionary(p => p.Nombre, p => _sesion.HasPermission(p.Nombre)));
         }
 
         // CONSULTA PUNTUAL: ¿EL ROL ACTIVO TIENE PERMISO PARA {accion}?

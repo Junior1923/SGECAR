@@ -23,6 +23,34 @@ Authorization: Bearer {{token}}
 GET {{SGECAR.API_HostAddress}}/api/auth/permisos/ELIMINAR
 Authorization: Bearer {{token}}
 
+### Listar permisos
+GET {{SGECAR.API_HostAddress}}/api/permisos
+Authorization: Bearer {{token}}
+
+### Crear permiso
+POST {{SGECAR.API_HostAddress}}/api/permisos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "EXPORTAR_REPORTES",
+  "descripcion": "Permite exportar reportes"
+}
+
+### Modificar permiso
+PUT {{SGECAR.API_HostAddress}}/api/permisos/7
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "EXPORTAR_PDF",
+  "descripcion": "Permite exportar reportes en PDF"
+}
+
+### Eliminar permiso
+DELETE {{SGECAR.API_HostAddress}}/api/permisos/7
+Authorization: Bearer {{token}}
+
 ### Listar roles
 GET {{SGECAR.API_HostAddress}}/api/roles
 Authorization: Bearer {{token}}

@@ -58,6 +58,19 @@ public class PermisoDto
     public string Nombre { get; set; } = string.Empty;
 
     public string? Descripcion { get; set; }
+
+    // PERMISO BASE DEL SISTEMA: NO SE PUEDE ELIMINAR NI RENOMBRAR
+    public bool EsSistema { get; set; }
+}
+
+public class PermisoRequest
+{
+    [Required(ErrorMessage = "El nombre del permiso es obligatorio.")]
+    [StringLength(100, ErrorMessage = "El nombre del permiso no puede exceder 100 caracteres.")]
+    public string Nombre { get; set; } = string.Empty;
+
+    [StringLength(200, ErrorMessage = "La descripción no puede exceder 200 caracteres.")]
+    public string? Descripcion { get; set; }
 }
 
 // ===================== ROLES =====================

@@ -31,6 +31,14 @@ public class RoleRepository
             .FirstOrDefaultAsync(r => r.RolId == rolId);
     }
 
+    // OBTENER UN ROL POR NOMBRE (CON SUS PERMISOS)
+    public async Task<Role?> GetRoleByName(string nombre)
+    {
+        return await _context.Roles
+            .Include(r => r.Permisos)
+            .FirstOrDefaultAsync(r => r.Nombre == nombre);
+    }
+
     // VERIFICAR SI YA EXISTE UN NOMBRE DE ROL
     public async Task<bool> ExistsRoleName(string nombre, int? excluirRolId = null)
     {

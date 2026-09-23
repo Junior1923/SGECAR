@@ -26,7 +26,7 @@ API REST (ASP.NET Core .NET 8) para el login, la sesión del usuario, la gestió
 - Las sesiones se guardan en memoria del servidor **mientras corre la API**. Si la API se reinicia, todos deben volver a iniciar sesión.
 - Una sesión expira tras **30 minutos sin actividad**. Cada petición válida renueva ese tiempo.
 - Si el administrador **elimina** a un usuario, lo **desactiva**, le **cambia el rol** o le **cambia la contraseña**, las sesiones abiertas de ese usuario se cierran de inmediato.
-- Si el administrador **modifica los permisos de un rol**, los usuarios con sesión abierta en ese rol reciben los permisos nuevos de inmediato, sin tener que volver a entrar.
+- Si el administrador **modifica los permisos de un rol**, o **renombra o elimina un permiso**, los usuarios con sesión abierta en los roles afectados reciben los permisos nuevos de inmediato, sin tener que volver a entrar.
 
 En Swagger: ejecutar el login, copiar el `token`, pulsar **Authorize** y pegarlo (sin la palabra `Bearer`).
 
@@ -45,7 +45,22 @@ En Swagger: ejecutar el login, copiar el `token`, pulsar **Authorize** y pegarlo
 | `CREAR_USUARIOS` | Gestionar usuarios            |
 | `CREAR_ROLES`    | Gestionar roles               |
 
-Estos nombres están como constantes en `SGECAR.Shared.Security.Acciones` (por ejemplo `Acciones.Eliminar`).
+Estos son los **permisos base** (`esSistema: true`). Están como constantes en `SGECAR.Shared.Security.Acciones` (por ejemplo `Acciones.Eliminar`). Como el control de acceso depende de ellos, no se pueden eliminar ni renombrar; solo se puede cambiar su descripción.
+
+Se pueden crear **permisos adicionales** con `POST /api/permisos` (por ejemplo `EXPORTAR_REPORTES`). Un permiso nuevo:
+
+- Se asigna automáticamente al rol **Administrador**.
+- Se asigna a otros roles con `PUT /api/roles/{id}`, incluyendo su id en `permisoIds`.
+- Se exige en un endpoint con `[RequierePermiso("EXPORTAR_REPORTES")]`.
+
+### Cómo se relacionan usuarios, roles y permisos
+
+```
+Usuario ──(rolId)──> Rol ──(RolPermiso)──> Permisos
+maria                Auditor               CONSULTAR, AGREGAR
+```
+
+Los permisos **no se asignan directamente a un usuario**. Cada usuario tiene un solo rol (`rolId` en `POST /api/usuarios`), y el rol tiene sus permisos (`permisoIds` en `POST /api/roles`).
 
 ### Matriz de permisos por rol
 
@@ -64,7 +79,7 @@ El rol **Administrador** es del sistema: no se puede modificar ni eliminar.
 
 ### Habilitar o deshabilitar botones y menús en el cliente
 
-El cliente debe llamar a `GET /api/auth/permisos` después del login y usar el resultado para habilitar o deshabilitar cada botón u opción de menú:
+El cliente debe llamar a `GET /api/auth/permisos` después del login y usar el resultado para habilitar o deshabilitar cada botón u opción de menú. Incluye todos los permisos de la BD, también los adicionales:
 
 ```json
 { "AGREGAR": false, "MODIFICAR": true, "ELIMINAR": false, "CONSULTAR": true, "CREAR_USUARIOS": false, "CREAR_ROLES": false }
@@ -105,7 +120,7 @@ Todos los errores devuelven un JSON con `mensaje`.
 | `401` | Sin token, token inválido o sesión expirada; o credenciales incorrectas en el login | `{ "mensaje": "..." }` |
 | `403` | **Permisos insuficientes** | `{ "mensaje": "...", "accion": "ELIMINAR", "rol": "Supervisor" }` |
 | `404` | El rol o usuario no existe | `{ "mensaje": "..." }` |
-| `409` | Conflicto: nombre duplicado, rol del sistema, rol con usuarios asignados | `{ "mensaje": "..." }` |
+| `409` | Conflicto: nombre duplicado, rol o permiso del sistema, rol con usuarios asignados | `{ "mensaje": "..." }` |
 | `423` | Cuenta bloqueada por intentos fallidos | `{ "mensaje": "..." }` |
 
 Ejemplo de `403`:
@@ -153,7 +168,11 @@ Resumen:
 | GET | `/api/auth/permisos` | Sesión |
 | GET | `/api/auth/permisos/{accion}` | Sesión |
 | GET | `/api/permisos` | `CONSULTAR` |
+| GET | `/api/permisos/{id}` | `CONSULTAR` |
 | GET | `/api/permisos/rol/{rolId}` | `CONSULTAR` |
+| POST | `/api/permisos` | `CREAR_ROLES` + `AGREGAR` |
+| PUT | `/api/permisos/{id}` | `CREAR_ROLES` + `MODIFICAR` |
+| DELETE | `/api/permisos/{id}` | `CREAR_ROLES` + `ELIMINAR` |
 | GET | `/api/roles` | `CREAR_ROLES` + `CONSULTAR` |
 | GET | `/api/roles/{id}` | `CREAR_ROLES` + `CONSULTAR` |
 | POST | `/api/roles` | `CREAR_ROLES` + `AGREGAR` |
@@ -166,7 +185,7 @@ Resumen:
 | POST | `/api/usuarios/{id}/desbloquear` | `CREAR_USUARIOS` + `MODIFICAR` |
 | DELETE | `/api/usuarios/{id}` | `CREAR_USUARIOS` + `ELIMINAR` |
 
-Con la matriz actual, la gestión de roles y usuarios queda solo para el **Administrador**.
+Con la matriz actual, la gestión de roles, permisos y usuarios queda solo para el **Administrador**.
 
 ### 5.1 Autenticación — `/api/auth`
 
@@ -235,24 +254,46 @@ GET /api/auth/permisos/eliminar
 
 ### 5.2 Permisos — `/api/permisos`
 
-#### `GET /api/permisos` — Listar permisos del sistema
+Objeto `Permiso`:
+
+```json
+{ "permisoId": 7, "nombre": "EXPORTAR_REPORTES", "descripcion": "Permite exportar reportes", "esSistema": false }
+```
+
+`esSistema = true` indica un permiso base (no se puede eliminar ni renombrar).
+
+#### `GET /api/permisos` — Listar permisos
 
 ```json
 [
-  { "permisoId": 1, "nombre": "AGREGAR", "descripcion": "Permite agregar registros" },
-  { "permisoId": 2, "nombre": "MODIFICAR", "descripcion": "Permite modificar registros" },
-  { "permisoId": 3, "nombre": "ELIMINAR", "descripcion": "Permite eliminar registros" },
-  { "permisoId": 4, "nombre": "CONSULTAR", "descripcion": "Permite consultar registros" },
-  { "permisoId": 5, "nombre": "CREAR_USUARIOS", "descripcion": "Permite crear nuevos usuarios" },
-  { "permisoId": 6, "nombre": "CREAR_ROLES", "descripcion": "Permite crear nuevos roles" }
+  { "permisoId": 1, "nombre": "AGREGAR", "descripcion": "Permite agregar registros", "esSistema": true },
+  { "permisoId": 2, "nombre": "MODIFICAR", "descripcion": "Permite modificar registros", "esSistema": true },
+  { "permisoId": 3, "nombre": "ELIMINAR", "descripcion": "Permite eliminar registros", "esSistema": true },
+  { "permisoId": 4, "nombre": "CONSULTAR", "descripcion": "Permite consultar registros", "esSistema": true },
+  { "permisoId": 5, "nombre": "CREAR_USUARIOS", "descripcion": "Permite crear nuevos usuarios", "esSistema": true },
+  { "permisoId": 6, "nombre": "CREAR_ROLES", "descripcion": "Permite crear nuevos roles", "esSistema": true }
 ]
 ```
 
 Los `permisoId` son los que se envían en `permisoIds` al crear o modificar un rol.
 
-#### `GET /api/permisos/rol/{rolId}` — Permisos de un rol
+#### Resto de endpoints
 
-Misma forma que el listado, filtrado por rol.
+| Endpoint | Petición | Respuesta correcta | Errores |
+|----------|----------|--------------------|---------|
+| `GET /api/permisos/{id}` | — | `200` `Permiso` | `404` |
+| `GET /api/permisos/rol/{rolId}` | — | `200` lista de `Permiso` del rol | — |
+| `POST /api/permisos` | `{ "nombre": "EXPORTAR_REPORTES", "descripcion": "Permite exportar reportes" }` | `201` `Permiso` creado | `400` nombre vacío o con formato inválido · `409` nombre duplicado |
+| `PUT /api/permisos/{id}` | `{ "nombre": "EXPORTAR_PDF", "descripcion": "Exporta PDF" }` | `200` `{ "mensaje": ... }` | `400` · `404` · `409` nombre duplicado o intento de renombrar un permiso base |
+| `DELETE /api/permisos/{id}` | — | `200` `{ "mensaje": "Permiso \"EXPORTAR_PDF\" eliminado correctamente (se quitó de 2 rol(es))." }` | `404` · `409` permiso base |
+
+Reglas:
+
+- **Nombre:** se guarda en mayúsculas. Solo admite letras sin acento, números y guion bajo, y debe empezar con una letra; máximo 100 caracteres. `exportar_reportes` se guarda como `EXPORTAR_REPORTES`.
+- **Descripción:** opcional, máximo 200 caracteres.
+- **Al crear**, el permiso se asigna automáticamente al rol Administrador.
+- **Al eliminar**, el permiso se quita de todos los roles que lo tenían.
+- **En un permiso base**, el `PUT` debe mantener el mismo `nombre`; solo cambia la descripción.
 
 ### 5.3 Roles — `/api/roles`
 
