@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SGECAR.Data.Context;
 using SGECAR.Shared.Models;
 
@@ -13,39 +13,56 @@ public class RoleRepository
         _context = context;
     }
 
-    // LISTAR TODOS LOS ROLES
+    // LISTAR TODOS LOS ROLES CON SUS PERMISOS Y USUARIOS
     public async Task<List<Role>> ListRoles()
     {
         return await _context.Roles
+            .Include(r => r.Permisos)
+            .Include(r => r.Usuarios)
+            .OrderBy(r => r.RolId)
             .ToListAsync();
     }
 
-    // OBTENER UN ROL POR ID
+    // OBTENER UN ROL POR ID (CON SUS PERMISOS)
     public async Task<Role?> GetRoleById(int rolId)
     {
         return await _context.Roles
+            .Include(r => r.Permisos)
             .FirstOrDefaultAsync(r => r.RolId == rolId);
     }
 
-    // CREAR UN NUEVO ROL
-    public async Task<bool> CreateRole(string nombre)
+    // VERIFICAR SI YA EXISTE UN NOMBRE DE ROL
+    public async Task<bool> ExistsRoleName(string nombre, int? excluirRolId = null)
     {
-        try
-        {
-            var role = new Role
-            {
-                Nombre = nombre
-            };
+        return await _context.Roles
+            .AnyAsync(r => r.Nombre == nombre && r.RolId != excluirRolId);
+    }
 
-            _context.Roles.Add(role);
+    // CONTAR USUARIOS ASIGNADOS A UN ROL
+    public async Task<int> CountUsersByRole(int rolId)
+    {
+        return await _context.Usuarios
+            .CountAsync(u => u.RolId == rolId);
+    }
 
-            await _context.SaveChangesAsync();
+    // CREAR UN NUEVO ROL
+    public async Task CreateRole(Role role)
+    {
+        _context.Roles.Add(role);
+        await _context.SaveChangesAsync();
+    }
 
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
+    // ELIMINAR UN ROL (PRIMERO QUITA SUS PERMISOS DE RolPermiso)
+    public async Task DeleteRole(Role role)
+    {
+        role.Permisos.Clear();
+        _context.Roles.Remove(role);
+        await _context.SaveChangesAsync();
+    }
+
+    // GUARDAR CAMBIOS DE ENTIDADES YA RASTREADAS
+    public async Task SaveChanges()
+    {
+        await _context.SaveChangesAsync();
     }
 }

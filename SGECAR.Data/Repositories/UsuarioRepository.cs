@@ -1,5 +1,3 @@
-﻿using System.Security.Cryptography;
-using System.Text;
 using Microsoft.EntityFrameworkCore;
 using SGECAR.Data.Context;
 using SGECAR.Shared.Models;
@@ -15,114 +13,56 @@ public class UsuarioRepository
         _context = context;
     }
 
-    // VALIDAR USUARIO
-    public async Task<Usuario?> UserValidate(
-        string usuario,
-        string contrasena)
+    // OBTENER USUARIO POR NOMBRE (INCLUYE ROL Y PERMISOS PARA EL LOGIN)
+    public async Task<Usuario?> GetUserByUsername(string usuario)
     {
-        var user = await _context.Usuarios
+        return await _context.Usuarios
             .Include(u => u.Rol)
+                .ThenInclude(r => r.Permisos)
             .FirstOrDefaultAsync(u => u.Usuario1 == usuario);
-
-        if (user == null)
-            return null;
-
-        if (!user.EstadoCuenta)
-            return null;
-
-        using var sha512 = SHA512.Create();
-
-        byte[] bytes = Encoding.UTF8.GetBytes(contrasena);
-        byte[] hash = sha512.ComputeHash(bytes);
-
-        string hashIngresado = Convert.ToHexString(hash);
-
-        if (user.ContrasenaHash != hashIngresado)
-            return null;
-
-        return user;
     }
 
-    // REGISTRAR INTENTO FALLIDO
-    public async Task RegisterFailAttempt(string usuario)
+    // OBTENER USUARIO POR ID
+    public async Task<Usuario?> GetUserById(int usuarioId)
     {
-        var user = await _context.Usuarios
-            .FirstOrDefaultAsync(u => u.Usuario1 == usuario);
-
-        if (user == null)
-            return;
-
-        user.IntentosFallidos++;
-
-        if (user.IntentosFallidos >= 3)
-        {
-            user.EstadoCuenta = false;
-        }
-
-        await _context.SaveChangesAsync();
-    }
-
-    // REINICIAR INTENTOS FALLIDOS
-    public async Task ResetFailAttempts(Usuario user)
-    {
-        user.IntentosFallidos = 0;
-
-        await _context.SaveChangesAsync();
-    }
-
-    // OBTENER ROL DEL USUARIO
-    public async Task<string?> GetRoleByUser(int usuarioId)
-    {
-        var user = await _context.Usuarios
+        return await _context.Usuarios
             .Include(u => u.Rol)
             .FirstOrDefaultAsync(u => u.UsuarioId == usuarioId);
-
-        if (user == null)
-            return null;
-
-        return user.Rol?.Nombre;
     }
 
-    // CREAR USUARIO
-    public async Task<bool> CreateUser(
-     string usuario,
-     string contrasena,
-     int rolId)
-    {
-        try
-        {
-            using var sha512 = SHA512.Create();
-
-            byte[] bytes = Encoding.UTF8.GetBytes(contrasena);
-            byte[] hash = sha512.ComputeHash(bytes);
-
-            string contrasenaHash = Convert.ToHexString(hash);
-
-            var nuevoUsuario = new Usuario
-            {
-                Usuario1 = usuario,
-                ContrasenaHash = contrasenaHash,
-                RolId = rolId,
-                IntentosFallidos = 0,
-                EstadoCuenta = true
-            };
-
-            _context.Usuarios.Add(nuevoUsuario);
-
-            await _context.SaveChangesAsync();
-
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
-    }
+    // LISTAR USUARIOS
     public async Task<List<Usuario>> ListUsers()
     {
         return await _context.Usuarios
             .Include(u => u.Rol)
+            .OrderBy(u => u.Usuario1)
             .ToListAsync();
     }
 
+    // VERIFICAR SI YA EXISTE UN NOMBRE DE USUARIO
+    public async Task<bool> ExistsUsername(string usuario, int? excluirUsuarioId = null)
+    {
+        return await _context.Usuarios
+            .AnyAsync(u => u.Usuario1 == usuario && u.UsuarioId != excluirUsuarioId);
+    }
+
+    // CREAR USUARIO
+    public async Task CreateUser(Usuario usuario)
+    {
+        _context.Usuarios.Add(usuario);
+        await _context.SaveChangesAsync();
+    }
+
+    // ELIMINAR USUARIO
+    public async Task DeleteUser(Usuario usuario)
+    {
+        _context.Usuarios.Remove(usuario);
+        await _context.SaveChangesAsync();
+    }
+
+    // GUARDAR CAMBIOS DE ENTIDADES YA RASTREADAS
+    public async Task SaveChanges()
+    {
+        await _context.SaveChangesAsync();
+    }
 }

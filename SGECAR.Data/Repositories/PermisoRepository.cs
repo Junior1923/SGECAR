@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SGECAR.Data.Context;
 using SGECAR.Shared.Models;
 
@@ -17,6 +17,17 @@ public class PermisoRepository
     public async Task<List<Permiso>> ListPermissions()
     {
         return await _context.Permisos
+            .OrderBy(p => p.PermisoId)
+            .ToListAsync();
+    }
+
+    // OBTENER PERMISOS POR SUS IDS
+    public async Task<List<Permiso>> GetPermissionsByIds(IEnumerable<int> permisoIds)
+    {
+        var ids = permisoIds.Distinct().ToList();
+
+        return await _context.Permisos
+            .Where(p => ids.Contains(p.PermisoId))
             .ToListAsync();
     }
 

@@ -1,6 +1,61 @@
 @SGECAR.API_HostAddress = http://localhost:5100
+# PEGAR AQUÍ EL TOKEN DEVUELTO POR EL LOGIN
+@token = PEGAR_TOKEN
 
-GET {{SGECAR.API_HostAddress}}/weatherforecast/
-Accept: application/json
+### Iniciar sesión
+POST {{SGECAR.API_HostAddress}}/api/auth/login
+Content-Type: application/json
 
-###
+{
+  "usuario": "admin",
+  "contrasena": "Admin123*"
+}
+
+### Sesión actual
+GET {{SGECAR.API_HostAddress}}/api/auth/sesion
+Authorization: Bearer {{token}}
+
+### Permisos del rol activo
+GET {{SGECAR.API_HostAddress}}/api/auth/permisos
+Authorization: Bearer {{token}}
+
+### ¿Tiene permiso para ELIMINAR?
+GET {{SGECAR.API_HostAddress}}/api/auth/permisos/ELIMINAR
+Authorization: Bearer {{token}}
+
+### Listar roles
+GET {{SGECAR.API_HostAddress}}/api/roles
+Authorization: Bearer {{token}}
+
+### Crear rol
+POST {{SGECAR.API_HostAddress}}/api/roles
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Auditor",
+  "permisoIds": [4]
+}
+
+### Listar usuarios
+GET {{SGECAR.API_HostAddress}}/api/usuarios
+Authorization: Bearer {{token}}
+
+### Crear usuario
+POST {{SGECAR.API_HostAddress}}/api/usuarios
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "usuario": "maria",
+  "contrasena": "Maria2026x",
+  "rolId": 3
+}
+
+### Desbloquear usuario
+POST {{SGECAR.API_HostAddress}}/api/usuarios/2/desbloquear
+Authorization: Bearer {{token}}
+
+### Cerrar sesión
+POST {{SGECAR.API_HostAddress}}/api/auth/logout
+Authorization: Bearer {{token}}
