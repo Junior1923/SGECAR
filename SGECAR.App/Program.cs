@@ -1,4 +1,4 @@
-
+using SGECAR.App.Servicios;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
@@ -18,6 +18,7 @@ builder.Services.AddHttpClient("SGECAR.API", cliente =>
 {
     cliente.BaseAddress = new Uri(builder.Configuration["ApiUrl"]!);
 });
+builder.Services.AddScoped<ApiCliente>();
 
 var app = builder.Build();
 
