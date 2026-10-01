@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SGECAR.App.Seguridad;
 using SGECAR.App.Servicios;
+using SGECAR.App.Utilidades;
 using SGECAR.Shared.Contracts;
 using SGECAR.Shared.Security;
 
@@ -59,5 +60,37 @@ public class IndexModel : PaginaProtegida
             .ToList();
 
         return Page();
+    }
+
+    public async Task<IActionResult> OnPostDesbloquearAsync(int id)
+    {
+        if (!Puede(Acciones.Modificar)) return PermisoDenegado(Acciones.Modificar);
+
+        var respuesta = await _api.DesbloquearUsuarioAsync(id);
+        var error = ManejarErrorApi(respuesta);
+        if (error is not null) return error;
+
+        MostrarResultado(respuesta, "Cuenta desbloqueada", "No se pudo desbloquear");
+        return RedirectToPage();
+    }
+
+    public async Task<IActionResult> OnPostEliminarAsync(int id)
+    {
+        if (!Puede(Acciones.Eliminar)) return PermisoDenegado(Acciones.Eliminar);
+
+        var respuesta = await _api.EliminarUsuarioAsync(id);
+        var error = ManejarErrorApi(respuesta);
+        if (error is not null) return error;
+
+        MostrarResultado(respuesta, "Usuario eliminado", "No se pudo eliminar");
+        return RedirectToPage();
+    }
+
+    private void MostrarResultado(RespuestaApi<MensajeResponse> respuesta, string tituloExito, string tituloError)
+    {
+        if (respuesta.Exitoso)
+            this.MostrarMessageBox(TipoMensaje.Exito, tituloExito, respuesta.Datos?.Mensaje ?? "");
+        else
+            this.MostrarMessageBox(TipoMensaje.Error, tituloError, respuesta.Mensaje);
     }
 }

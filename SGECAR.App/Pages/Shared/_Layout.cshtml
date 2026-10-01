@@ -28,6 +28,10 @@
                 {
                     <a asp-page="/Usuarios/Index" class="opcion @Activo("/Usuarios")">@Iconos.Svg("users") <span>Usuarios</span></a>
                 }
+                @if (Puede(Acciones.CrearRoles))
+                {
+                    <a asp-page="/Roles/Index" class="opcion @Activo("/Roles")">@Iconos.Svg("key") <span>Roles</span></a>
+                }
                 @* Etapas II y III: agregar aquí las opciones de los nuevos módulos *@
             </div>
 

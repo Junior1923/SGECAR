@@ -9,10 +9,16 @@
         <h1>Usuarios</h1>
         <p>Cuentas de acceso al sistema.</p>
     </div>
-    @if (Model.Puede(Acciones.Agregar))
-    {
-        <a asp-page="Crear" class="btn btn-primario">@Iconos.Svg("plus") Nuevo usuario</a>
-    }
+    <div class="d-flex gap-2">
+        @if (Model.Puede(Acciones.CrearRoles))
+        {
+            <a asp-page="/Roles/Index" class="btn btn-secundario">@Iconos.Svg("key") Roles</a>
+        }
+        @if (Model.Puede(Acciones.Agregar))
+        {
+            <a asp-page="Crear" class="btn btn-primario">@Iconos.Svg("plus") Nuevo usuario</a>
+        }
+    </div>
 </div>
 
 <div class="indicadores">
@@ -42,20 +48,22 @@
                     <th>Rol</th>
                     <th>Estado</th>
                     <th class="text-center">Intentos fallidos</th>
+                    <th class="text-end">Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 @if (Model.Usuarios.Count == 0)
                 {
-                    <tr><td colspan="4" class="tabla-vacia">No se encontraron usuarios.</td></tr>
+                    <tr><td colspan="5" class="tabla-vacia">No se encontraron usuarios.</td></tr>
                 }
                 @foreach (var u in Model.Usuarios)
                 {
+                    var esUsted = u.UsuarioId == Model.UsuarioActual.UsuarioId;
                     <tr>
                         <td>
                             <span class="av">@u.Usuario.Substring(0, 1).ToUpper()</span>
                             <strong>@u.Usuario</strong>
-                            @if (u.UsuarioId == Model.UsuarioActual.UsuarioId) { <span class="etiqueta-tu">usted</span> }
+                            @if (esUsted) { <span class="etiqueta-tu">usted</span> }
                         </td>
                         <td>@u.Rol</td>
                         <td>
@@ -64,6 +72,25 @@
                             else { <span class="estado estado-inactivo">Inactivo</span> }
                         </td>
                         <td class="text-center">@u.IntentosFallidos</td>
+                        <td class="text-end text-nowrap">
+                            @if (!u.EstadoCuenta && Model.Puede(Acciones.Modificar))
+                            {
+                                <form method="post" asp-page-handler="Desbloquear" asp-route-id="@u.UsuarioId" class="d-inline">
+                                    <button type="submit" class="btn-accion btn-accion-exito">@Iconos.Svg("unlock") @(IndexModel.EstaBloqueado(u) ? "Desbloquear" : "Activar")</button>
+                                </form>
+                            }
+                            @if (Model.Puede(Acciones.Modificar))
+                            {
+                                <a asp-page="Editar" asp-route-id="@u.UsuarioId" class="btn-accion">@Iconos.Svg("edit") Modificar</a>
+                            }
+                            @if (!esUsted && Model.Puede(Acciones.Eliminar))
+                            {
+                                <form method="post" asp-page-handler="Eliminar" asp-route-id="@u.UsuarioId" class="d-inline"
+                                      data-confirmar="¿Eliminar el usuario «@u.Usuario»? Ya no podrá iniciar sesión.">
+                                    <button type="submit" class="btn-accion btn-accion-peligro">@Iconos.Svg("trash") Eliminar</button>
+                                </form>
+                            }
+                        </td>
                     </tr>
                 }
             </tbody>

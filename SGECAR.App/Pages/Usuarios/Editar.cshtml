@@ -1,0 +1,38 @@
+@page "{id:int}"
+@model SGECAR.App.Pages.Usuarios.EditarModel
+@{
+    ViewData["Title"] = "Modificar usuario";
+}
+<div class="formulario">
+    <a asp-page="Index" class="volver">@Iconos.Svg("arrow-left") Usuarios</a>
+    <div class="encabezado"><div><h1>Modificar usuario</h1><p>@Model.NombreUsuario</p></div></div>
+
+    <form method="post" class="panel panel-formulario" novalidate autocomplete="off">
+        <div asp-validation-summary="ModelOnly" class="alerta-error"></div>
+        <input type="hidden" asp-for="Id" />
+        <div class="row g-3">
+            <div class="col-md-6 campo">
+                <label asp-for="Entrada.RolId"></label>
+                <select asp-for="Entrada.RolId" asp-items="Model.OpcionesRol" class="entrada selector"></select>
+                <span asp-validation-for="Entrada.RolId" class="error-campo"></span>
+            </div>
+            <div class="col-md-6 campo d-flex align-items-end">
+                <label class="interruptor">
+                    <input asp-for="Entrada.EstadoCuenta" type="checkbox" />
+                    <span></span> Cuenta activa
+                </label>
+            </div>
+            <div class="col-12 campo">
+                <label asp-for="Entrada.NuevaContrasena"></label>
+                <input asp-for="Entrada.NuevaContrasena" type="password" class="entrada" maxlength="100" />
+                <small class="ayuda">Déjela en blanco para mantener la actual.</small>
+                <span asp-validation-for="Entrada.NuevaContrasena" class="error-campo"></span>
+            </div>
+        </div>
+        <div class="botones">
+            <a asp-page="Index" class="btn btn-secundario">Cancelar</a>
+            <button type="submit" class="btn btn-primario">Guardar cambios</button>
+        </div>
+    </form>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

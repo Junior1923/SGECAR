@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using SGECAR.Shared.Contracts;
 
@@ -47,13 +47,31 @@ public class ApiCliente
     public Task<RespuestaApi<List<UsuarioDto>>> ListarUsuariosAsync() =>
         EnviarAsync<List<UsuarioDto>>(HttpMethod.Get, "api/usuarios");
 
+    public Task<RespuestaApi<UsuarioDto>> ObtenerUsuarioAsync(int id) =>
+        EnviarAsync<UsuarioDto>(HttpMethod.Get, $"api/usuarios/{id}");
+
     public Task<RespuestaApi<UsuarioDto>> CrearUsuarioAsync(UsuarioCrearRequest datos) =>
         EnviarAsync<UsuarioDto>(HttpMethod.Post, "api/usuarios", datos);
 
-    // ---------- Roles ----------
+    public Task<RespuestaApi<MensajeResponse>> ModificarUsuarioAsync(int id, UsuarioActualizarRequest datos) =>
+        EnviarAsync<MensajeResponse>(HttpMethod.Put, $"api/usuarios/{id}", datos);
+
+    public Task<RespuestaApi<MensajeResponse>> DesbloquearUsuarioAsync(int id) =>
+        EnviarAsync<MensajeResponse>(HttpMethod.Post, $"api/usuarios/{id}/desbloquear");
+
+    public Task<RespuestaApi<MensajeResponse>> EliminarUsuarioAsync(int id) =>
+        EnviarAsync<MensajeResponse>(HttpMethod.Delete, $"api/usuarios/{id}");
+
+    // ---------- Roles y permisos ----------
 
     public Task<RespuestaApi<List<RolDto>>> ListarRolesAsync() =>
         EnviarAsync<List<RolDto>>(HttpMethod.Get, "api/roles");
+
+    public Task<RespuestaApi<RolDto>> CrearRolAsync(RolRequest datos) =>
+        EnviarAsync<RolDto>(HttpMethod.Post, "api/roles", datos);
+
+    public Task<RespuestaApi<List<PermisoDto>>> ListarPermisosAsync() =>
+        EnviarAsync<List<PermisoDto>>(HttpMethod.Get, "api/permisos");
 
     // ---------- Envío común ----------
 

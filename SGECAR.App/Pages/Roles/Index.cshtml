@@ -1,0 +1,92 @@
+@page
+@model SGECAR.App.Pages.Roles.IndexModel
+@{
+    ViewData["Title"] = "Roles y permisos";
+}
+
+<div class="encabezado">
+    <div>
+        <h1>Roles y permisos</h1>
+        <p>Qué puede hacer cada tipo de usuario.</p>
+    </div>
+    <a asp-page="/Usuarios/Index" class="btn btn-secundario">@Iconos.Svg("users") Usuarios</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-8">
+        <div class="panel">
+            <div class="table-responsive">
+                <table class="tabla tabla-roles">
+                    <thead>
+                        <tr>
+                            <th>Rol</th>
+                            @foreach (var p in Model.Permisos)
+                            {
+                                <th class="text-center">@NombresPermiso.Descripcion(p.Nombre)</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var rol in Model.Roles)
+                        {
+                            <tr>
+                                <td>
+                                    <strong class="d-block">@rol.Nombre</strong>
+                                    <small class="texto-suave">@rol.CantidadUsuarios usuario(s)</small>
+                                </td>
+                                @foreach (var p in Model.Permisos)
+                                {
+                                    <td class="text-center">
+                                        @if (rol.Permisos.Any(x => x.PermisoId == p.PermisoId))
+                                        {
+                                            <span class="si" title="Permitido">@Iconos.Svg("check")</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="no" title="No permitido">@Iconos.Svg("x")</span>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.Puede(Acciones.Agregar))
+    {
+        <div class="col-xl-4">
+            <form method="post" class="panel panel-formulario" novalidate>
+                <h2 class="panel-titulo">Nuevo rol</h2>
+                <div asp-validation-summary="ModelOnly" class="alerta-error"></div>
+
+                <div class="campo">
+                    <label asp-for="NombreRol"></label>
+                    <input asp-for="NombreRol" class="entrada" placeholder="Ej.: Auditor" maxlength="50" />
+                    <span asp-validation-for="NombreRol" class="error-campo"></span>
+                </div>
+
+                <div class="campo">
+                    <label>Permisos</label>
+                    <div class="lista-permisos">
+                        @foreach (var p in Model.Permisos)
+                        {
+                            var id = "perm_" + p.PermisoId;
+                            <label class="casilla" for="@id">
+                                <input type="checkbox" name="PermisoIds" value="@p.PermisoId" id="@id"
+                                       @(Model.PermisoIds.Contains(p.PermisoId) ? "checked" : "") />
+                                <span>@NombresPermiso.Descripcion(p.Nombre)</span>
+                            </label>
+                        }
+                    </div>
+                    <span asp-validation-for="PermisoIds" class="error-campo"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primario btn-bloque">Crear rol</button>
+            </form>
+        </div>
+    }
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

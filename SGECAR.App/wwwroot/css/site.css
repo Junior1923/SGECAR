@@ -234,6 +234,28 @@ a { color: var(--acento); }
 .msg-advertencia .msgbox-icono { background: var(--aviso-fondo); color: var(--aviso); }
 .msg-info .msgbox-icono { background: var(--info-fondo); color: var(--info); }
 
+/* ---------- Acciones de tabla y roles ---------- */
+.btn-accion {
+    display: inline-flex; align-items: center; gap: .35rem;
+    background: var(--superficie-2); color: var(--texto-2);
+    border: 0; border-radius: 999px; padding: .35rem .8rem; margin-left: .3rem;
+    font-size: .8rem; font-weight: 700; text-decoration: none;
+}
+.btn-accion:hover { background: #ebe2d7; color: var(--texto); }
+.btn-accion-peligro { background: var(--peligro-fondo); color: var(--peligro); }
+.btn-accion-peligro:hover { background: #f3d2c3; color: var(--peligro); }
+.btn-accion-exito { background: var(--exito-fondo); color: var(--exito); }
+.btn-accion-exito:hover { background: #d3e6d9; color: var(--exito); }
+.texto-suave { color: var(--texto-suave); }
+.panel-titulo { font-size: 1.15rem; font-weight: 800; margin: 0 0 1.2rem; }
+.tabla-roles th { white-space: normal; font-size: .72rem; }
+.lista-permisos { display: grid; grid-template-columns: 1fr 1fr; gap: .45rem; }
+.casilla { display: flex !important; align-items: center; gap: .55rem; background: var(--superficie); border: 1.5px solid var(--borde); border-radius: 12px; padding: .55rem .75rem; cursor: pointer; margin: 0 !important; font-weight: 600 !important; font-size: .88rem; }
+.casilla input { accent-color: var(--verde); width: 16px; height: 16px; }
+.casilla:has(input:checked) { border-color: var(--verde); background: #eef2ee; }
+.btn-peligro:hover { background: #973d1c; color: #fff; }
+@media (max-width: 767px) { .lista-permisos { grid-template-columns: 1fr; } }
+
 /* ---------- Pantallas pequeñas ---------- */
 @media (max-width: 991px) {
     .cuenta-contenedor { grid-template-columns: 1fr; }
