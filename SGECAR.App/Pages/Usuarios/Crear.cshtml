@@ -1,0 +1,49 @@
+@page
+@model SGECAR.App.Pages.Usuarios.CrearModel
+@{
+    ViewData["Title"] = "Nuevo usuario";
+}
+<div class="formulario">
+    <a asp-page="Index" class="volver">@Iconos.Svg("arrow-left") Usuarios</a>
+    <div class="encabezado"><div><h1>Nuevo usuario</h1><p>La contraseña se guarda cifrada.</p></div></div>
+
+    <form method="post" class="panel panel-formulario" novalidate autocomplete="off">
+        <div asp-validation-summary="ModelOnly" class="alerta-error"></div>
+        <div class="row g-3">
+            <div class="col-12 campo">
+                <label asp-for="Entrada.Usuario"></label>
+                <input asp-for="Entrada.Usuario" class="entrada" maxlength="50" autofocus />
+                <small class="ayuda">Letras, números, punto o guion bajo.</small>
+                <span asp-validation-for="Entrada.Usuario" class="error-campo"></span>
+            </div>
+            <div class="col-md-6 campo">
+                <label asp-for="Entrada.Contrasena"></label>
+                <div class="entrada-grupo">
+                    <input asp-for="Entrada.Contrasena" type="password" class="entrada" maxlength="100" />
+                    <button type="button" class="ver-clave" tabindex="-1" data-objetivo="#Entrada_Contrasena" title="Mostrar contraseña">
+                        <span class="ver">@Iconos.Svg("eye")</span><span class="ocultar d-none">@Iconos.Svg("eye-off")</span>
+                    </button>
+                </div>
+                <small class="ayuda">Mínimo 8 caracteres, con letras y números.</small>
+                <span asp-validation-for="Entrada.Contrasena" class="error-campo"></span>
+            </div>
+            <div class="col-md-6 campo">
+                <label asp-for="Entrada.ConfirmarContrasena"></label>
+                <input asp-for="Entrada.ConfirmarContrasena" type="password" class="entrada" maxlength="100" />
+                <span asp-validation-for="Entrada.ConfirmarContrasena" class="error-campo"></span>
+            </div>
+            <div class="col-md-6 campo">
+                <label asp-for="Entrada.RolId"></label>
+                <select asp-for="Entrada.RolId" asp-items="Model.OpcionesRol" class="entrada selector">
+                    <option value="">Seleccione un rol</option>
+                </select>
+                <span asp-validation-for="Entrada.RolId" class="error-campo"></span>
+            </div>
+        </div>
+        <div class="botones">
+            <a asp-page="Index" class="btn btn-secundario">Cancelar</a>
+            <button type="submit" class="btn btn-primario">Crear usuario</button>
+        </div>
+    </form>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

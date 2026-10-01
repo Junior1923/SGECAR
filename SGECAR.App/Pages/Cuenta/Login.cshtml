@@ -1,0 +1,52 @@
+@page
+@model SGECAR.App.Pages.Cuenta.LoginModel
+@{
+    ViewData["Title"] = "Iniciar sesión";
+    Layout = "_LayoutCuenta";
+}
+
+<div class="login">
+    <div class="login-marca">
+        <span class="logo">@Iconos.Svg("shield")</span>
+        <span>SGECAR</span>
+    </div>
+
+    <div class="login-encabezado">
+        <h1>Hola de nuevo</h1>
+        <p>Inicie sesión para continuar</p>
+    </div>
+
+    <form method="post" id="formLogin" autocomplete="off" novalidate>
+        <div asp-validation-summary="ModelOnly" class="alerta-error"></div>
+
+        <div class="campo">
+            <label asp-for="Usuario">Usuario</label>
+            <div class="entrada-grupo">
+                @Iconos.Svg("user")
+                <input asp-for="Usuario" class="entrada" placeholder="Nombre de usuario" autofocus maxlength="50" />
+            </div>
+            <span asp-validation-for="Usuario" class="error-campo"></span>
+        </div>
+
+        <div class="campo">
+            <label asp-for="Contrasena">Contraseña</label>
+            <div class="entrada-grupo">
+                @Iconos.Svg("lock")
+                <input asp-for="Contrasena" type="password" class="entrada" placeholder="Contraseña" maxlength="100" />
+                <button type="button" class="ver-clave" tabindex="-1" data-objetivo="#Contrasena" title="Mostrar contraseña">
+                    <span class="ver">@Iconos.Svg("eye")</span><span class="ocultar d-none">@Iconos.Svg("eye-off")</span>
+                </button>
+            </div>
+            <span asp-validation-for="Contrasena" class="error-campo"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primario btn-bloque">Iniciar sesión</button>
+        <a asp-page="/Cuenta/Salir" class="btn btn-secundario btn-bloque">Salir</a>
+    </form>
+
+    <p class="login-nota">La cuenta se bloquea después de 3 intentos fallidos.</p>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

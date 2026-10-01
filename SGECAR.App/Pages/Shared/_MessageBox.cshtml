@@ -1,0 +1,44 @@
+@* Ventana de mensajes (equivalente a MessageBox.Show) y ventana de confirmación Sí/No *@
+@{
+    var tipo = TempData["MsgTipo"] as string;
+    var titulo = TempData["MsgTitulo"] as string;
+    var texto = TempData["MsgTexto"] as string;
+
+    var (clase, icono) = tipo switch
+    {
+        "Exito" => ("msg-exito", "check-circle"),
+        "Error" => ("msg-error", "x-circle"),
+        "Advertencia" => ("msg-advertencia", "alert"),
+        _ => ("msg-info", "info")
+    };
+}
+
+@if (!string.IsNullOrEmpty(texto))
+{
+    <div class="modal fade" id="messageBox" tabindex="-1" aria-labelledby="messageBoxTitulo" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content msgbox @clase">
+                <div class="msgbox-icono">@Iconos.Svg(icono)</div>
+                <h2 class="msgbox-titulo" id="messageBoxTitulo">@titulo</h2>
+                <p class="msgbox-texto">@texto</p>
+                <div class="msgbox-botones">
+                    <button type="button" class="btn btn-primario" data-bs-dismiss="modal" autofocus>Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="modal fade" id="confirmBox" tabindex="-1" aria-labelledby="confirmBoxTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content msgbox msg-advertencia">
+            <div class="msgbox-icono">@Iconos.Svg("alert")</div>
+            <h2 class="msgbox-titulo" id="confirmBoxTitulo">Confirmar</h2>
+            <p class="msgbox-texto" id="confirmBoxTexto"></p>
+            <div class="msgbox-botones">
+                <button type="button" class="btn btn-secundario" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-peligro" id="confirmBoxSi">Sí, eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>

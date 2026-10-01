@@ -1,0 +1,39 @@
+@* Plantilla del inicio de sesión (sin menú) *@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] · SGECAR</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="cuenta">
+    <div class="cuenta-contenedor">
+        <aside class="cuenta-arte" aria-hidden="true">
+            <span class="forma forma-1"></span>
+            <span class="forma forma-2"></span>
+            <span class="forma forma-3"></span>
+            <div class="marca">
+                <span class="logo">@Iconos.Svg("shield")</span>
+                <span>SGECAR</span>
+            </div>
+            <div class="cuenta-lema">
+                <h2>Su empresa, en orden.</h2>
+                <p>Usuarios, roles y permisos bajo control.</p>
+            </div>
+        </aside>
+
+        <main class="cuenta-centro">
+            @RenderBody()
+        </main>
+    </div>
+
+    <partial name="_MessageBox" />
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

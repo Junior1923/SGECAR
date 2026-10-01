@@ -1,0 +1,73 @@
+@page
+@model SGECAR.App.Pages.Usuarios.IndexModel
+@{
+    ViewData["Title"] = "Usuarios";
+}
+
+<div class="encabezado">
+    <div>
+        <h1>Usuarios</h1>
+        <p>Cuentas de acceso al sistema.</p>
+    </div>
+    @if (Model.Puede(Acciones.Agregar))
+    {
+        <a asp-page="Crear" class="btn btn-primario">@Iconos.Svg("plus") Nuevo usuario</a>
+    }
+</div>
+
+<div class="indicadores">
+    <div class="indicador"><span>Total</span><strong>@Model.Total</strong></div>
+    <div class="indicador"><span>Activos</span><strong>@Model.Activos</strong></div>
+    <div class="indicador"><span>Inactivos</span><strong>@Model.Inactivos</strong></div>
+    <div class="indicador indicador-alerta"><span>Bloqueados</span><strong>@Model.Bloqueados</strong></div>
+</div>
+
+<div class="panel">
+    <form method="get" class="panel-filtros">
+        <div class="entrada-grupo flex-grow-1">
+            @Iconos.Svg("search")
+            <input type="search" name="buscar" value="@Model.Buscar" class="entrada" placeholder="Buscar usuario..." maxlength="50" />
+        </div>
+        <select name="rolId" class="entrada selector" asp-items="Model.OpcionesRol" onchange="this.form.submit()">
+            <option value="">Todos los roles</option>
+        </select>
+        <button type="submit" class="btn btn-secundario">Buscar</button>
+    </form>
+
+    <div class="table-responsive">
+        <table class="tabla">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th class="text-center">Intentos fallidos</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Usuarios.Count == 0)
+                {
+                    <tr><td colspan="4" class="tabla-vacia">No se encontraron usuarios.</td></tr>
+                }
+                @foreach (var u in Model.Usuarios)
+                {
+                    <tr>
+                        <td>
+                            <span class="av">@u.Usuario.Substring(0, 1).ToUpper()</span>
+                            <strong>@u.Usuario</strong>
+                            @if (u.UsuarioId == Model.UsuarioActual.UsuarioId) { <span class="etiqueta-tu">usted</span> }
+                        </td>
+                        <td>@u.Rol</td>
+                        <td>
+                            @if (u.EstadoCuenta) { <span class="estado estado-activo">Activo</span> }
+                            else if (IndexModel.EstaBloqueado(u)) { <span class="estado estado-bloqueado">Bloqueado</span> }
+                            else { <span class="estado estado-inactivo">Inactivo</span> }
+                        </td>
+                        <td class="text-center">@u.IntentosFallidos</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="panel-pie">@Model.Usuarios.Count registro(s)</div>
+</div>

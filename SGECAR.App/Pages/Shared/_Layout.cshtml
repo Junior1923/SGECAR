@@ -1,51 +1,69 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+@* Menú principal: barra superior con las opciones permitidas para el rol *@
+@{
+    var usuario = Context.Session.ObtenerUsuario();
+    bool Puede(string accion) => Context.Session.TienePermiso(accion);
+    var pagina = ViewContext.RouteData.Values["page"]?.ToString() ?? "";
+    string Activo(string prefijo) => pagina.StartsWith(prefijo) ? "activo" : "";
+}
+<!DOCTYPE html>
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - SGECAR</title>
+    <title>@ViewData["Title"] · SGECAR</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/SGECAR.App.styles.css" asp-append-version="true" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">SGECAR</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
+<body class="app">
+    <header class="cabecera">
+        <nav class="menu-principal" aria-label="Menú principal">
+            <a asp-page="/Menu/Index" class="marca">
+                <span class="logo">@Iconos.Svg("shield")</span>
+                <span>SGECAR</span>
+            </a>
+
+            <div class="menu-opciones">
+                <a asp-page="/Menu/Index" class="opcion @Activo("/Menu")">@Iconos.Svg("home") <span>Inicio</span></a>
+                @if (Puede(Acciones.CrearUsuarios))
+                {
+                    <a asp-page="/Usuarios/Index" class="opcion @Activo("/Usuarios")">@Iconos.Svg("users") <span>Usuarios</span></a>
+                }
+                @* Etapas II y III: agregar aquí las opciones de los nuevos módulos *@
+            </div>
+
+            @if (usuario is not null)
+            {
+                <div class="dropdown ms-auto">
+                    <button class="usuario-chip" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="av">@usuario.Usuario.Substring(0, 1).ToUpper()</span>
+                        <span class="usuario-datos">
+                            <strong>@usuario.Usuario</strong>
+                            <small>@usuario.Rol</small>
+                        </span>
+                        @Iconos.Svg("chevron-down")
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li class="dropdown-header">Sesión iniciada como @usuario.Usuario</li>
+                        <li>
+                            <form method="post" asp-page="/Cuenta/CerrarSesion">
+                                <button type="submit" class="dropdown-item">@Iconos.Svg("log-out") Cerrar sesión</button>
+                            </form>
                         </li>
                     </ul>
                 </div>
-            </div>
+            }
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - SGECAR - <a asp-area="" asp-page="/Privacy">Privacy</a>
-        </div>
-    </footer>
+    <main class="principal">
+        @RenderBody()
+    </main>
+
+    <partial name="_MessageBox" />
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
