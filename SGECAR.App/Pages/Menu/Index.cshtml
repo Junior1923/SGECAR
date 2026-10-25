@@ -1,0 +1,61 @@
+@page
+@model SGECAR.App.Pages.Menu.IndexModel
+@{
+    ViewData["Title"] = "Inicio";
+}
+
+<section class="bienvenida">
+    <div>
+        <h1>Hola, @Model.UsuarioActual.Usuario</h1>
+        <p>Ha iniciado sesión como <span class="rol-etiqueta">@Model.UsuarioActual.Rol</span></p>
+    </div>
+</section>
+
+<h2 class="subtitulo">Módulos</h2>
+<div class="modulos">
+    @foreach (var m in Model.Modulos)
+    {
+        <a asp-page="@m.Pagina" class="modulo @(m.Habilitado ? "" : "modulo-bloqueado")">
+            <span class="modulo-icono">@Iconos.Svg(m.Icono)</span>
+            <span class="modulo-texto">
+                <strong>@m.Nombre</strong>
+                <small>@m.Descripcion</small>
+            </span>
+            @if (!m.Habilitado)
+            {
+                <span class="modulo-candado" title="Sin acceso">@Iconos.Svg("lock")</span>
+            }
+        </a>
+    }
+</div>
+
+<h2 class="subtitulo">Permisos de su rol</h2>
+<div class="panel">
+    <table class="tabla tabla-permisos">
+        <thead>
+            <tr>
+                @foreach (var a in Acciones.Todas)
+                {
+                    <th>@NombresPermiso.Descripcion(a)</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                @foreach (var a in Acciones.Todas)
+                {
+                    <td>
+                        @if (Model.Puede(a))
+                        {
+                            <span class="si">@Iconos.Svg("check") Sí</span>
+                        }
+                        else
+                        {
+                            <span class="no">@Iconos.Svg("x") No</span>
+                        }
+                    </td>
+                }
+            </tr>
+        </tbody>
+    </table>
+</div>

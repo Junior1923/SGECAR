@@ -1,23 +1,27 @@
-
-using Microsoft.EntityFrameworkCore;
-using SGECAR.Data.Context;
-using SGECAR.Data.Repositories;
-
+using SGECAR.App.Servicios;
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddRazorPages();
 
-builder.Services.AddDbContext<GestionEmpresarialContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("GestionEmpresarialConnection")
-    )
-);
-builder.Services.AddScoped<UsuarioRepository>();
+// Sesión: aquí se guardan el token y los datos del usuario logueado
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(opciones =>
+{
+    opciones.IdleTimeout = TimeSpan.FromMinutes(30);
+    opciones.Cookie.HttpOnly = true;
+    opciones.Cookie.IsEssential = true;
+});
+builder.Services.AddHttpContextAccessor();
+
+// Cliente HTTP que apunta a la API
+builder.Services.AddHttpClient("SGECAR.API", cliente =>
+{
+    cliente.BaseAddress = new Uri(builder.Configuration["ApiUrl"]!);
+});
+builder.Services.AddScoped<ApiCliente>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
@@ -28,6 +32,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseSession();
 
 app.UseAuthorization();
 

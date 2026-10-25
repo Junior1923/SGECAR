@@ -1,0 +1,19 @@
+@page
+@model SGECAR.App.Pages.Cuenta.SalirModel
+@{
+    ViewData["Title"] = "Salir";
+    Layout = "_LayoutCuenta";
+}
+@* En el navegador no se puede cerrar la aplicación como en escritorio:
+   se borra la sesión y se indica al usuario que puede cerrar la ventana. *@
+<div class="login text-center">
+    <div class="login-marca justify-content-center">
+        <span class="logo">@Iconos.Svg("power")</span>
+    </div>
+    <div class="login-encabezado">
+        <h1>Ha salido del sistema</h1>
+        <p>Ya puede cerrar esta ventana.</p>
+    </div>
+    <button type="button" class="btn btn-secundario btn-bloque" onclick="window.close()">Cerrar ventana</button>
+    <a asp-page="/Cuenta/Login" class="btn btn-primario btn-bloque">Volver a iniciar sesión</a>
+</div>
