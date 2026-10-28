@@ -139,3 +139,90 @@ public class UsuarioActualizarRequest
     // OPCIONAL: SI SE ENVÍA VACÍO O NULL SE CONSERVA LA CONTRASEÑA ACTUAL
     public string? NuevaContrasena { get; set; }
 }
+
+// ===================== CLIENTES =====================
+
+public class ClienteDto
+{
+    public int ClienteId { get; set; }
+
+    public string Nombre { get; set; } = string.Empty;
+
+    public string Apellido { get; set; } = string.Empty;
+
+    public string? Telefono { get; set; }
+
+    public string Correo { get; set; } = string.Empty;
+
+    public string? Direccion { get; set; }
+}
+
+// SE USA PARA CREAR Y PARA MODIFICAR
+public class ClienteRequest
+{
+    [Required(ErrorMessage = "El nombre es obligatorio.")]
+    [StringLength(100, ErrorMessage = "El nombre no puede exceder 100 caracteres.")]
+    public string Nombre { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "El apellido es obligatorio.")]
+    [StringLength(100, ErrorMessage = "El apellido no puede exceder 100 caracteres.")]
+    public string Apellido { get; set; } = string.Empty;
+
+    [StringLength(20, ErrorMessage = "El teléfono no puede exceder 20 caracteres.")]
+    public string? Telefono { get; set; }
+
+    [Required(ErrorMessage = "El correo es obligatorio.")]
+    [StringLength(254, ErrorMessage = "El correo no puede exceder 254 caracteres.")]
+    [EmailAddress(ErrorMessage = "El correo no tiene un formato válido.")]
+    public string Correo { get; set; } = string.Empty;
+
+    [StringLength(250, ErrorMessage = "La dirección no puede exceder 250 caracteres.")]
+    public string? Direccion { get; set; }
+}
+
+// ===================== PRODUCTOS =====================
+
+public class CategoriaDto
+{
+    public int CategoriaId { get; set; }
+
+    public string Nombre { get; set; } = string.Empty;
+}
+
+public class ProductoDto
+{
+    public int ProductoId { get; set; }
+
+    public string Codigo { get; set; } = string.Empty;
+
+    public string Nombre { get; set; } = string.Empty;
+
+    public decimal Precio { get; set; }
+
+    public int Stock { get; set; }
+
+    public int CategoriaId { get; set; }
+
+    public string Categoria { get; set; } = string.Empty;
+}
+
+// SE USA PARA CREAR Y PARA MODIFICAR
+public class ProductoRequest
+{
+    [Required(ErrorMessage = "El código es obligatorio.")]
+    [StringLength(50, ErrorMessage = "El código no puede exceder 50 caracteres.")]
+    public string Codigo { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "El nombre es obligatorio.")]
+    [StringLength(150, ErrorMessage = "El nombre no puede exceder 150 caracteres.")]
+    public string Nombre { get; set; } = string.Empty;
+
+    [Range(0, double.MaxValue, ErrorMessage = "El precio no puede ser negativo.")]
+    public decimal Precio { get; set; }
+
+    [Range(0, int.MaxValue, ErrorMessage = "El stock no puede ser negativo.")]
+    public int Stock { get; set; }
+
+    [Range(1, int.MaxValue, ErrorMessage = "Seleccione una categoría válida.")]
+    public int CategoriaId { get; set; }
+}

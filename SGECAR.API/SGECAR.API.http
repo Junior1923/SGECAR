@@ -84,6 +84,86 @@ Content-Type: application/json
 POST {{SGECAR.API_HostAddress}}/api/usuarios/2/desbloquear
 Authorization: Bearer {{token}}
 
+### Listar clientes (buscar es opcional: nombre, apellido, teléfono o correo)
+GET {{SGECAR.API_HostAddress}}/api/clientes?buscar=perez
+Authorization: Bearer {{token}}
+
+### Obtener cliente
+GET {{SGECAR.API_HostAddress}}/api/clientes/1
+Authorization: Bearer {{token}}
+
+### Crear cliente
+POST {{SGECAR.API_HostAddress}}/api/clientes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Luis",
+  "apellido": "Mota",
+  "telefono": "809-555-0104",
+  "correo": "luis.mota@example.com",
+  "direccion": "La Vega"
+}
+
+### Modificar cliente
+PUT {{SGECAR.API_HostAddress}}/api/clientes/4
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Luis",
+  "apellido": "Mota Díaz",
+  "telefono": "809-555-0104",
+  "correo": "luis.mota@example.com",
+  "direccion": "Jarabacoa"
+}
+
+### Eliminar cliente
+DELETE {{SGECAR.API_HostAddress}}/api/clientes/4
+Authorization: Bearer {{token}}
+
+### Listar categorías (para la lista desplegable de productos)
+GET {{SGECAR.API_HostAddress}}/api/productos/categorias
+Authorization: Bearer {{token}}
+
+### Listar productos (buscar y categoriaId son opcionales)
+GET {{SGECAR.API_HostAddress}}/api/productos?buscar=mouse&categoriaId=3
+Authorization: Bearer {{token}}
+
+### Obtener producto
+GET {{SGECAR.API_HostAddress}}/api/productos/1
+Authorization: Bearer {{token}}
+
+### Crear producto
+POST {{SGECAR.API_HostAddress}}/api/productos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "codigo": "PROD-004",
+  "nombre": "Silla ergonómica",
+  "precio": 2500.00,
+  "stock": 5,
+  "categoriaId": 2
+}
+
+### Modificar producto
+PUT {{SGECAR.API_HostAddress}}/api/productos/4
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "codigo": "PROD-004",
+  "nombre": "Silla ergonómica",
+  "precio": 2350.00,
+  "stock": 8,
+  "categoriaId": 2
+}
+
+### Eliminar producto
+DELETE {{SGECAR.API_HostAddress}}/api/productos/4
+Authorization: Bearer {{token}}
+
 ### Cerrar sesión
 POST {{SGECAR.API_HostAddress}}/api/auth/logout
 Authorization: Bearer {{token}}

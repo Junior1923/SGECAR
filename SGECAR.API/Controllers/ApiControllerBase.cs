@@ -51,5 +51,32 @@ namespace SGECAR.API.Controllers
             EstadoCuenta = usuario.EstadoCuenta,
             IntentosFallidos = usuario.IntentosFallidos
         };
+
+        protected static ClienteDto ToDto(Cliente cliente) => new()
+        {
+            ClienteId = cliente.ClienteId,
+            Nombre = cliente.Nombre,
+            Apellido = cliente.Apellido,
+            Telefono = cliente.Telefono,
+            Correo = cliente.Correo,
+            Direccion = cliente.Direccion
+        };
+
+        protected static CategoriaDto ToDto(Categoria categoria) => new()
+        {
+            CategoriaId = categoria.CategoriaId,
+            Nombre = categoria.Nombre
+        };
+
+        protected static ProductoDto ToDto(Producto producto) => new()
+        {
+            ProductoId = producto.ProductoId,
+            Codigo = producto.Codigo,
+            Nombre = producto.Nombre,
+            Precio = producto.Precio,
+            Stock = producto.Stock,
+            CategoriaId = producto.CategoriaId,
+            Categoria = producto.Categoria?.Nombre ?? string.Empty
+        };
     }
 }

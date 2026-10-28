@@ -29,12 +29,16 @@ builder.Services.AddScoped<SesionActual>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IPermisoRepository, PermisoRepository>();
+builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
+builder.Services.AddScoped<IProductoRepository, ProductoRepository>();
 
 // SERVICIOS DE NEGOCIO
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IRolService, RolService>();
 builder.Services.AddScoped<IPermisoService, PermisoService>();
+builder.Services.AddScoped<IClienteService, ClienteService>();
+builder.Services.AddScoped<IProductoService, ProductoService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

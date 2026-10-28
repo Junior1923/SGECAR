@@ -184,8 +184,19 @@ Resumen:
 | PUT | `/api/usuarios/{id}` | `CREAR_USUARIOS` + `MODIFICAR` |
 | POST | `/api/usuarios/{id}/desbloquear` | `CREAR_USUARIOS` + `MODIFICAR` |
 | DELETE | `/api/usuarios/{id}` | `CREAR_USUARIOS` + `ELIMINAR` |
+| GET | `/api/clientes` | `CONSULTAR` |
+| GET | `/api/clientes/{id}` | `CONSULTAR` |
+| POST | `/api/clientes` | `AGREGAR` |
+| PUT | `/api/clientes/{id}` | `MODIFICAR` |
+| DELETE | `/api/clientes/{id}` | `ELIMINAR` |
+| GET | `/api/productos` | `CONSULTAR` |
+| GET | `/api/productos/{id}` | `CONSULTAR` |
+| GET | `/api/productos/categorias` | `CONSULTAR` |
+| POST | `/api/productos` | `AGREGAR` |
+| PUT | `/api/productos/{id}` | `MODIFICAR` |
+| DELETE | `/api/productos/{id}` | `ELIMINAR` |
 
-Con la matriz actual, la gestión de roles, permisos y usuarios queda solo para el **Administrador**.
+Con la matriz actual, la gestión de roles, permisos y usuarios queda solo para el **Administrador**. Clientes y productos usan los permisos genéricos: el Supervisor consulta y modifica, y el Ejecutor consulta y agrega.
 
 ### 5.1 Autenticación — `/api/auth`
 
@@ -352,6 +363,76 @@ Notas sobre `PUT /api/usuarios/{id}`:
 - `estadoCuenta: true` en una cuenta bloqueada la reactiva y reinicia los intentos fallidos.
 - Un usuario no puede cambiar su propio rol ni desactivar su propia cuenta (`400`).
 
+### 5.5 Clientes — `/api/clientes`
+
+Objeto `Cliente`:
+
+```json
+{
+  "clienteId": 1,
+  "nombre": "Ana",
+  "apellido": "García",
+  "telefono": "809-555-0101",
+  "correo": "ana.prueba@example.com",
+  "direccion": "Santo Domingo"
+}
+```
+
+`POST` y `PUT` reciben el mismo cuerpo, sin `clienteId`.
+
+| Endpoint | Petición | Respuesta correcta | Errores |
+|----------|----------|--------------------|---------|
+| `GET /api/clientes?buscar=perez` | `buscar` opcional | `200` lista de `Cliente` | — |
+| `GET /api/clientes/{id}` | — | `200` `Cliente` | `404` |
+| `POST /api/clientes` | `{ "nombre": "Luis", "apellido": "Mota", "telefono": "809-555-0104", "correo": "luis@example.com", "direccion": "La Vega" }` | `201` `Cliente` creado | `400` datos inválidos · `409` correo duplicado |
+| `PUT /api/clientes/{id}` | igual que `POST` | `200` `{ "mensaje": ... }` | `400` · `404` · `409` correo duplicado |
+| `DELETE /api/clientes/{id}` | — | `200` `{ "mensaje": ... }` | `404` |
+
+Reglas:
+
+- **Nombre y apellido:** obligatorios, máximo 100 caracteres.
+- **Correo:** obligatorio, formato válido, máximo 254 caracteres y único (sin distinguir mayúsculas).
+- **Teléfono:** opcional, máximo 20 caracteres; solo números, espacios, guiones, paréntesis y `+`.
+- **Dirección:** opcional, máximo 250 caracteres.
+- Los campos opcionales vacíos se guardan como `null`, y todos los textos se guardan sin espacios al inicio ni al final.
+- **Búsqueda:** `buscar` filtra por nombre completo, teléfono o correo, sin distinguir mayúsculas ni acentos (`perez` encuentra `Pérez`).
+
+### 5.6 Productos — `/api/productos`
+
+Objeto `Producto`:
+
+```json
+{
+  "productoId": 1,
+  "codigo": "PROD-001",
+  "nombre": "Teclado USB",
+  "precio": 850.00,
+  "stock": 15,
+  "categoriaId": 1,
+  "categoria": "Electrónica"
+}
+```
+
+`POST` y `PUT` reciben `codigo`, `nombre`, `precio`, `stock` y `categoriaId`.
+
+| Endpoint | Petición | Respuesta correcta | Errores |
+|----------|----------|--------------------|---------|
+| `GET /api/productos?buscar=mouse&categoriaId=3` | `buscar` y `categoriaId` opcionales | `200` lista de `Producto` | — |
+| `GET /api/productos/{id}` | — | `200` `Producto` | `404` |
+| `GET /api/productos/categorias` | — | `200` `[ { "categoriaId": 1, "nombre": "Electrónica" }, ... ]` | — |
+| `POST /api/productos` | `{ "codigo": "PROD-004", "nombre": "Silla", "precio": 2500.00, "stock": 5, "categoriaId": 2 }` | `201` `Producto` creado | `400` datos inválidos o categoría inexistente · `409` código duplicado |
+| `PUT /api/productos/{id}` | igual que `POST` | `200` `{ "mensaje": ... }` | `400` · `404` · `409` código duplicado |
+| `DELETE /api/productos/{id}` | — | `200` `{ "mensaje": ... }` | `404` |
+
+Reglas:
+
+- **Código:** obligatorio, máximo 50 caracteres y único (sin distinguir mayúsculas).
+- **Nombre:** obligatorio, máximo 150 caracteres.
+- **Precio:** mayor o igual a 0, con 2 decimales como máximo.
+- **Stock:** entero mayor o igual a 0.
+- **Categoría:** debe existir. Las categorías se cargan con el script SQL; no tienen mantenimiento propio.
+- **Búsqueda:** `buscar` filtra por código o nombre, sin distinguir mayúsculas ni acentos.
+
 ---
 
 ## 6. Usuarios de prueba
@@ -372,14 +453,14 @@ El archivo `SGECAR.API.http` tiene peticiones de ejemplo listas para ejecutar de
 
 | Capa | Archivos | Responsabilidad |
 |------|----------|-----------------|
-| API | `Controllers/AuthController.cs`, `RolesController.cs`, `UsuariosController.cs`, `PermisosController.cs`, `ApiControllerBase.cs` | Endpoints y conversión de resultados a códigos HTTP |
+| API | `Controllers/AuthController.cs`, `RolesController.cs`, `UsuariosController.cs`, `PermisosController.cs`, `ClientesController.cs`, `ProductosController.cs`, `ApiControllerBase.cs` | Endpoints y conversión de resultados a códigos HTTP |
 | API | `Security/SesionStore.cs` | Sesiones activas en memoria (token → usuario, rol y permisos) |
 | API | `Security/SesionActual.cs` | Sesión de la petición actual y `HasPermission(accion)` |
 | API | `Security/Filtros.cs` | `[PermitirAnonimo]`, `[RequierePermiso]`, respuestas `401` y `403` |
 | Business | `Services/AuthService.cs` | Login, intentos fallidos y bloqueo (implementa `IAuthService`) |
-| Business | `Services/RolService.cs`, `UsuarioService.cs`, `PermisoService.cs` | Reglas de negocio del CRUD (implementan `IRolService`, `IUsuarioService`, `IPermisoService`) |
+| Business | `Services/RolService.cs`, `UsuarioService.cs`, `PermisoService.cs`, `ClienteService.cs`, `ProductoService.cs` | Reglas de negocio del CRUD (implementan `IRolService`, `IUsuarioService`, `IPermisoService`, `IClienteService`, `IProductoService`) |
 | Business | `Security/PasswordHasher.cs` | Hash y verificación de contraseñas |
-| Data | `Repositories/*.cs` | Acceso a datos con Entity Framework Core (implementan `IUsuarioRepository`, `IRoleRepository`, `IPermisoRepository`) |
+| Data | `Repositories/*.cs` | Acceso a datos con Entity Framework Core (implementan `IUsuarioRepository`, `IRoleRepository`, `IPermisoRepository`, `IClienteRepository`, `IProductoRepository`) |
 | Shared | `Contracts/Services/I*Service.cs` | Interfaces de los servicios |
 | Shared | `Contracts/Repositories/I*Repository.cs` | Interfaces de los repositorios |
 | Shared | `Contracts/*.cs` | DTOs y resultados |
@@ -399,11 +480,15 @@ El registro está en `Program.cs`:
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IPermisoRepository, PermisoRepository>();
+builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
+builder.Services.AddScoped<IProductoRepository, ProductoRepository>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IRolService, RolService>();
 builder.Services.AddScoped<IPermisoService, PermisoService>();
+builder.Services.AddScoped<IClienteService, ClienteService>();
+builder.Services.AddScoped<IProductoService, ProductoService>();
 ```
 
 Para un módulo nuevo: crear la interfaz en `SGECAR.Shared/Contracts`, implementarla en Business o Data, registrarla en `Program.cs` e inyectarla por la interfaz.
