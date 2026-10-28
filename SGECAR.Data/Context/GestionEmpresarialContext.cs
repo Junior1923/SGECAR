@@ -21,6 +21,12 @@ public partial class GestionEmpresarialContext : DbContext
     public virtual DbSet<Role> Roles { get; set; }
 
     public virtual DbSet<Usuario> Usuarios { get; set; }
+
+    public virtual DbSet<Cliente> Clientes { get; set; }
+
+    public virtual DbSet<Categoria> Categorias { get; set; }
+
+    public virtual DbSet<Producto> Productos { get; set; }
     /*
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
@@ -77,6 +83,40 @@ public partial class GestionEmpresarialContext : DbContext
                 .HasForeignKey(d => d.RolId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Usuarios_Rol");
+        });
+
+        modelBuilder.Entity<Cliente>(entity =>
+        {
+            entity.HasIndex(e => e.Correo, "UQ_Clientes_Correo").IsUnique();
+
+            entity.Property(e => e.Nombre).HasMaxLength(100);
+            entity.Property(e => e.Apellido).HasMaxLength(100);
+            entity.Property(e => e.Telefono).HasMaxLength(20);
+            entity.Property(e => e.Correo).HasMaxLength(254);
+            entity.Property(e => e.Direccion).HasMaxLength(250);
+        });
+
+        modelBuilder.Entity<Categoria>(entity =>
+        {
+            entity.HasIndex(e => e.Nombre, "UQ_Categorias_Nombre").IsUnique();
+
+            entity.Property(e => e.Nombre).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<Producto>(entity =>
+        {
+            entity.HasIndex(e => e.Codigo, "UQ_Productos_Codigo").IsUnique();
+
+            entity.HasIndex(e => e.CategoriaId, "IX_Productos_CategoriaId");
+
+            entity.Property(e => e.Codigo).HasMaxLength(50);
+            entity.Property(e => e.Nombre).HasMaxLength(150);
+            entity.Property(e => e.Precio).HasColumnType("decimal(18, 2)");
+
+            entity.HasOne(d => d.Categoria).WithMany(p => p.Productos)
+                .HasForeignKey(d => d.CategoriaId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Productos_Categorias");
         });
 
         OnModelCreatingPartial(modelBuilder);
