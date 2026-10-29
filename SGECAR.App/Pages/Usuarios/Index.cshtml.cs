@@ -21,6 +21,7 @@ public class IndexModel : PaginaProtegida
     // Solo entra quien puede gestionar usuarios (Administrador)
     protected override string? AccionRequerida => Acciones.CrearUsuarios;
 
+    [BindProperty(SupportsGet = true)] public int? Id { get; set; }
     [BindProperty(SupportsGet = true)] public string? Buscar { get; set; }
     [BindProperty(SupportsGet = true)] public int? RolId { get; set; }
 
@@ -30,6 +31,8 @@ public class IndexModel : PaginaProtegida
     public int Activos { get; private set; }
     public int Inactivos { get; private set; }
     public int Bloqueados { get; private set; }
+
+    public bool HayFiltros => Id.HasValue || !string.IsNullOrWhiteSpace(Buscar) || RolId.HasValue;
 
     // La API marca la cuenta como inactiva al bloquearla; se distingue por los intentos
     public static bool EstaBloqueado(UsuarioDto u) => !u.EstadoCuenta && u.IntentosFallidos >= MaximoIntentos;
@@ -48,6 +51,8 @@ public class IndexModel : PaginaProtegida
 
         // Consulta dinámica según la búsqueda y el rol elegido
         IEnumerable<UsuarioDto> consulta = todos;
+        if (Id.HasValue)
+            consulta = consulta.Where(u => u.UsuarioId == Id.Value);
         if (!string.IsNullOrWhiteSpace(Buscar))
             consulta = consulta.Where(u => u.Usuario.Contains(Buscar.Trim(), StringComparison.OrdinalIgnoreCase));
         if (RolId.HasValue)

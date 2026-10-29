@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body class="app">
-    <header class="cabecera">
+    <header class="cabecera no-imprimir">
         <nav class="menu-principal" aria-label="Menú principal">
             <a asp-page="/Menu/Index" class="marca">
                 <span class="logo">@Iconos.Svg("shield")</span>
@@ -24,6 +24,11 @@
 
             <div class="menu-opciones">
                 <a asp-page="/Menu/Index" class="opcion @Activo("/Menu")">@Iconos.Svg("home") <span>Inicio</span></a>
+                @if (Puede(Acciones.Consultar))
+                {
+                    <a asp-page="/Clientes/Index" class="opcion @Activo("/Clientes")">@Iconos.Svg("user-check") <span>Clientes</span></a>
+                    <a asp-page="/Productos/Index" class="opcion @Activo("/Productos")">@Iconos.Svg("package") <span>Productos</span></a>
+                }
                 @if (Puede(Acciones.CrearUsuarios))
                 {
                     <a asp-page="/Usuarios/Index" class="opcion @Activo("/Usuarios")">@Iconos.Svg("users") <span>Usuarios</span></a>
@@ -32,7 +37,11 @@
                 {
                     <a asp-page="/Roles/Index" class="opcion @Activo("/Roles")">@Iconos.Svg("key") <span>Roles</span></a>
                 }
-                @* Etapas II y III: agregar aquí las opciones de los nuevos módulos *@
+                @if (Puede(Acciones.CrearUsuarios))
+                {
+                    <a asp-page="/Reportes/Usuarios" class="opcion @Activo("/Reportes")">@Iconos.Svg("grid") <span>Reportes</span></a>
+                }
+                @* Etapa III: agregar aquí las opciones de los nuevos módulos *@
             </div>
 
             @if (usuario is not null)

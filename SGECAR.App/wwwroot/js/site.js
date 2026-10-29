@@ -23,6 +23,25 @@ document.addEventListener("DOMContentLoaded", function () {
         jQuery("form select, form input").on("change", function () { jQuery(this).valid(); });
     }
 
+    // Botón "Limpiar campos": vacía el formulario y quita los mensajes de error
+    document.querySelectorAll("[data-limpiar]").forEach(function (boton) {
+        boton.addEventListener("click", function () {
+            var form = boton.closest("form");
+            form.querySelectorAll("input, select, textarea").forEach(function (campo) {
+                if (campo.type === "hidden" || campo.type === "submit" || campo.type === "button") return;
+                if (campo.type === "checkbox" || campo.type === "radio") campo.checked = false;
+                else if (campo.tagName === "SELECT") campo.selectedIndex = 0;
+                else campo.value = "";
+            });
+            form.querySelectorAll(".error-campo").forEach(function (e) { e.textContent = ""; });
+            form.querySelectorAll(".input-validation-error").forEach(function (e) { e.classList.remove("input-validation-error"); });
+            var resumen = form.querySelector(".alerta-error");
+            if (resumen) resumen.innerHTML = "";
+            var primero = form.querySelector("input:not([type=hidden]), select, textarea");
+            if (primero) primero.focus();
+        });
+    });
+
     // Confirmación antes de enviar formularios con data-confirmar
     var confirmBox = document.getElementById("confirmBox");
     var pendiente = null;

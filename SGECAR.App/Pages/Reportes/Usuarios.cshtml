@@ -1,0 +1,117 @@
+@page
+@model SGECAR.App.Pages.Reportes.UsuariosModel
+@{
+    ViewData["Title"] = "Reporte de usuarios";
+}
+
+<div class="encabezado no-imprimir">
+    <div>
+        <h1>Reporte de usuarios</h1>
+        <p>Seleccione los filtros y genere el reporte.</p>
+    </div>
+</div>
+
+@* Formulario de filtros: se llena antes de generar el reporte *@
+<form method="get" class="panel panel-formulario no-imprimir mb-4">
+    <input type="hidden" name="generar" value="true" />
+    <div class="row g-3 align-items-end">
+        <div class="col-md-2 campo">
+            <label for="id">ID</label>
+            <input type="number" id="id" name="id" value="@Model.Id" class="entrada" min="1" placeholder="Todos" />
+        </div>
+        <div class="col-md-4 campo">
+            <label for="buscar">Nombre</label>
+            <input type="search" id="buscar" name="buscar" value="@Model.Buscar" class="entrada" maxlength="50" placeholder="Todos" />
+        </div>
+        <div class="col-md-3 campo">
+            <label for="rolId">Rol</label>
+            <select id="rolId" name="rolId" class="entrada selector" asp-items="Model.OpcionesRol">
+                <option value="">Todos</option>
+            </select>
+        </div>
+        <div class="col-md-3 campo">
+            <label for="estado">Estado</label>
+            <select id="estado" name="estado" class="entrada selector">
+                <option value="">Todos</option>
+                @foreach (var e in new[] { "Activo", "Inactivo", "Bloqueado" })
+                {
+                    <option value="@e" selected="@(Model.Estado == e)">@e</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="botones">
+        <a asp-page="Usuarios" class="btn btn-secundario">Limpiar</a>
+        <button type="submit" class="btn btn-primario">@Iconos.Svg("grid") Generar reporte</button>
+    </div>
+</form>
+
+@if (Model.Generado)
+{
+    <div class="d-flex justify-content-end mb-3 no-imprimir">
+        <button type="button" class="btn btn-secundario" onclick="window.print()">@Iconos.Svg("save") Imprimir / Guardar PDF</button>
+    </div>
+
+    <section class="reporte">
+        <header class="reporte-encabezado">
+            <div class="marca">
+                <span class="logo">@Iconos.Svg("shield")</span>
+                <span>SGECAR</span>
+            </div>
+            <div class="text-end">
+                <h2>Reporte de usuarios</h2>
+                <p>Generado el @Model.FechaGeneracion.ToString("dd/MM/yyyy 'a las' hh:mm tt")</p>
+                <p>Por: <strong>@Model.UsuarioActual.Usuario</strong> (@Model.UsuarioActual.Rol)</p>
+            </div>
+        </header>
+
+        <div class="reporte-filtros">
+            <strong>Filtros aplicados:</strong>
+            @if (Model.FiltrosAplicados.Count == 0)
+            {
+                <span>Ninguno (todos los registros)</span>
+            }
+            @foreach (var f in Model.FiltrosAplicados)
+            {
+                <span class="chip-filtro">@f</span>
+            }
+        </div>
+
+        <table class="tabla reporte-tabla">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Usuario</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th class="text-center">Intentos fallidos</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Usuarios.Count == 0)
+                {
+                    <tr><td colspan="5" class="tabla-vacia">No hay registros que cumplan los filtros.</td></tr>
+                }
+                @foreach (var u in Model.Usuarios)
+                {
+                    <tr>
+                        <td>@u.UsuarioId</td>
+                        <td><strong>@u.Usuario</strong></td>
+                        <td>@u.Rol</td>
+                        <td>@SGECAR.App.Pages.Reportes.UsuariosModel.EstadoDe(u)</td>
+                        <td class="text-center">@u.IntentosFallidos</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <footer class="reporte-resumen">
+            <div><span>Total de registros</span><strong>@Model.Usuarios.Count</strong></div>
+            @foreach (var g in Model.PorRol)
+            {
+                <div><span>@g.Key</span><strong>@g.Value</strong></div>
+            }
+            <div><span>Activos</span><strong>@Model.Usuarios.Count(u => u.EstadoCuenta)</strong></div>
+        </footer>
+    </section>
+}

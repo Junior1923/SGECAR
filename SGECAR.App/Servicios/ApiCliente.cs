@@ -73,6 +73,57 @@ public class ApiCliente
     public Task<RespuestaApi<List<PermisoDto>>> ListarPermisosAsync() =>
         EnviarAsync<List<PermisoDto>>(HttpMethod.Get, "api/permisos");
 
+    // ---------- Clientes ----------
+
+    // buscar: la API lo compara con nombre, apellido, teléfono y correo
+    public Task<RespuestaApi<List<ClienteDto>>> ListarClientesAsync(string? buscar = null) =>
+        EnviarAsync<List<ClienteDto>>(HttpMethod.Get, ConFiltros("api/clientes", ("buscar", buscar)));
+
+    public Task<RespuestaApi<ClienteDto>> ObtenerClienteAsync(int id) =>
+        EnviarAsync<ClienteDto>(HttpMethod.Get, $"api/clientes/{id}");
+
+    public Task<RespuestaApi<ClienteDto>> CrearClienteAsync(ClienteRequest datos) =>
+        EnviarAsync<ClienteDto>(HttpMethod.Post, "api/clientes", datos);
+
+    public Task<RespuestaApi<MensajeResponse>> ModificarClienteAsync(int id, ClienteRequest datos) =>
+        EnviarAsync<MensajeResponse>(HttpMethod.Put, $"api/clientes/{id}", datos);
+
+    public Task<RespuestaApi<MensajeResponse>> EliminarClienteAsync(int id) =>
+        EnviarAsync<MensajeResponse>(HttpMethod.Delete, $"api/clientes/{id}");
+
+    // ---------- Productos ----------
+
+    // buscar: código o nombre; categoriaId: filtro opcional
+    public Task<RespuestaApi<List<ProductoDto>>> ListarProductosAsync(string? buscar = null, int? categoriaId = null) =>
+        EnviarAsync<List<ProductoDto>>(HttpMethod.Get,
+            ConFiltros("api/productos", ("buscar", buscar), ("categoriaId", categoriaId?.ToString())));
+
+    public Task<RespuestaApi<ProductoDto>> ObtenerProductoAsync(int id) =>
+        EnviarAsync<ProductoDto>(HttpMethod.Get, $"api/productos/{id}");
+
+    public Task<RespuestaApi<List<CategoriaDto>>> ListarCategoriasAsync() =>
+        EnviarAsync<List<CategoriaDto>>(HttpMethod.Get, "api/productos/categorias");
+
+    public Task<RespuestaApi<ProductoDto>> CrearProductoAsync(ProductoRequest datos) =>
+        EnviarAsync<ProductoDto>(HttpMethod.Post, "api/productos", datos);
+
+    public Task<RespuestaApi<MensajeResponse>> ModificarProductoAsync(int id, ProductoRequest datos) =>
+        EnviarAsync<MensajeResponse>(HttpMethod.Put, $"api/productos/{id}", datos);
+
+    public Task<RespuestaApi<MensajeResponse>> EliminarProductoAsync(int id) =>
+        EnviarAsync<MensajeResponse>(HttpMethod.Delete, $"api/productos/{id}");
+
+    // Arma la ruta con los filtros que tengan valor, por ejemplo: api/productos?buscar=mouse&categoriaId=3
+    private static string ConFiltros(string ruta, params (string Nombre, string? Valor)[] filtros)
+    {
+        var partes = filtros
+            .Where(f => !string.IsNullOrWhiteSpace(f.Valor))
+            .Select(f => $"{f.Nombre}={Uri.EscapeDataString(f.Valor!.Trim())}")
+            .ToList();
+
+        return partes.Count == 0 ? ruta : $"{ruta}?{string.Join("&", partes)}";
+    }
+
     // ---------- Envío común ----------
 
     private async Task<RespuestaApi<T>> EnviarAsync<T>(HttpMethod metodo, string ruta, object? cuerpo = null)

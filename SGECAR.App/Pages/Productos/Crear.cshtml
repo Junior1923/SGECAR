@@ -1,0 +1,20 @@
+@page
+@model SGECAR.App.Pages.Productos.CrearModel
+@{
+    ViewData["Title"] = "Nuevo producto";
+}
+<div class="formulario">
+    <a asp-page="Index" class="volver">@Iconos.Svg("arrow-left") Productos</a>
+    <div class="encabezado"><div><h1>Nuevo producto</h1><p>Todos los campos son obligatorios.</p></div></div>
+
+    <form method="post" class="panel panel-formulario" novalidate autocomplete="off">
+        <div asp-validation-summary="ModelOnly" class="alerta-error"></div>
+        <partial name="_FormularioProducto" for="Entrada" />
+        <div class="botones">
+            <button type="button" class="btn btn-secundario me-auto" data-limpiar>@Iconos.Svg("x") Limpiar campos</button>
+            <a asp-page="Index" class="btn btn-secundario">Cancelar</a>
+            <button type="submit" class="btn btn-primario">@Iconos.Svg("save") Registrar producto</button>
+        </div>
+    </form>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

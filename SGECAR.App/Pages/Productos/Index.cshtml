@@ -1,0 +1,105 @@
+@page
+@model SGECAR.App.Pages.Productos.IndexModel
+@{
+    ViewData["Title"] = "Productos";
+    var puedeAgregar = Model.Puede(Acciones.Agregar);
+    var puedeModificar = Model.Puede(Acciones.Modificar);
+    var puedeEliminar = Model.Puede(Acciones.Eliminar);
+}
+
+<div class="encabezado">
+    <div>
+        <h1>Productos</h1>
+        <p>Inventario de productos por categoría.</p>
+    </div>
+    <a asp-page="Crear" class="btn btn-primario @(puedeAgregar ? "" : "btn-bloqueado")" title="@(puedeAgregar ? "" : "Su rol no puede agregar")">
+        @Iconos.Svg(puedeAgregar ? "plus" : "lock") Nuevo producto
+    </a>
+</div>
+
+<div class="indicadores">
+    <div class="indicador"><span>Productos</span><strong>@Model.Total</strong></div>
+    <div class="indicador"><span>Unidades en stock</span><strong>@Model.Unidades.ToString("N0", System.Globalization.CultureInfo.InvariantCulture)</strong></div>
+    <div class="indicador indicador-alerta"><span>Agotados</span><strong>@Model.Agotados</strong></div>
+    <div class="indicador"><span>Valor del inventario</span><strong class="indicador-monto">@IndexModel.Moneda(Model.ValorInventario)</strong></div>
+</div>
+
+<div class="panel">
+    <form method="get" class="panel-filtros">
+        <input type="number" name="id" value="@Model.Id" class="entrada filtro-id" placeholder="ID" min="1" />
+        <div class="entrada-grupo flex-grow-1">
+            @Iconos.Svg("search")
+            <input type="search" name="buscar" value="@Model.Buscar" class="entrada" placeholder="Buscar por código o nombre..." maxlength="150" />
+        </div>
+        <select name="categoriaId" class="entrada selector" asp-items="Model.OpcionesCategoria" onchange="this.form.submit()">
+            <option value="">Todas las categorías</option>
+        </select>
+        <select name="existencia" class="entrada selector" onchange="this.form.submit()">
+            <option value="">Todo el stock</option>
+            <option value="disponible" selected="@(Model.Existencia == "disponible")">Disponible</option>
+            <option value="bajo" selected="@(Model.Existencia == "bajo")">Stock bajo (≤ @IndexModel.StockBajo)</option>
+            <option value="agotado" selected="@(Model.Existencia == "agotado")">Agotado</option>
+        </select>
+        <button type="submit" class="btn btn-secundario">Buscar</button>
+        @if (Model.HayFiltros)
+        {
+            <a asp-page="Index" class="btn btn-secundario">Limpiar</a>
+        }
+    </form>
+
+    <div class="table-responsive">
+        <table class="tabla">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Código</th>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th class="text-end">Precio</th>
+                    <th class="text-center">Stock</th>
+                    <th class="text-end">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Productos.Count == 0)
+                {
+                    <tr><td colspan="7" class="tabla-vacia">No se encontraron productos.</td></tr>
+                }
+                @foreach (var p in Model.Productos)
+                {
+                    <tr>
+                        <td class="texto-suave">@p.ProductoId</td>
+                        <td><span class="codigo">@p.Codigo</span></td>
+                        <td><strong>@p.Nombre</strong></td>
+                        <td>@p.Categoria</td>
+                        <td class="text-end text-nowrap">@IndexModel.Moneda(p.Precio)</td>
+                        <td class="text-center">
+                            @if (p.Stock == 0) { <span class="estado estado-bloqueado">Agotado</span> }
+                            else if (p.Stock <= IndexModel.StockBajo) { <span class="estado estado-inactivo">@p.Stock</span> }
+                            else { <span class="estado estado-activo">@p.Stock</span> }
+                        </td>
+                        <td class="text-end text-nowrap">
+                            <a asp-page="Editar" asp-route-id="@p.ProductoId" class="btn-accion @(puedeModificar ? "" : "btn-bloqueado")">
+                                @Iconos.Svg(puedeModificar ? "edit" : "lock") Modificar
+                            </a>
+                            @if (puedeEliminar)
+                            {
+                                <form method="post" asp-page-handler="Eliminar" asp-route-id="@p.ProductoId" class="d-inline"
+                                      data-confirmar="¿Eliminar el producto «@p.Codigo - @p.Nombre»? Esta acción no se puede deshacer.">
+                                    <button type="submit" class="btn-accion btn-accion-peligro">@Iconos.Svg("trash") Eliminar</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form method="post" asp-page-handler="Eliminar" asp-route-id="@p.ProductoId" class="d-inline">
+                                    <button type="submit" class="btn-accion btn-bloqueado">@Iconos.Svg("lock") Eliminar</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="panel-pie">@Model.Productos.Count registro(s)</div>
+</div>

@@ -1,0 +1,21 @@
+@page "{id:int}"
+@model SGECAR.App.Pages.Clientes.EditarModel
+@{
+    ViewData["Title"] = "Modificar cliente";
+}
+<div class="formulario">
+    <a asp-page="Index" class="volver">@Iconos.Svg("arrow-left") Clientes</a>
+    <div class="encabezado"><div><h1>Modificar cliente</h1><p>Cliente #@Model.Id</p></div></div>
+
+    <form method="post" class="panel panel-formulario" novalidate autocomplete="off">
+        <div asp-validation-summary="ModelOnly" class="alerta-error"></div>
+        <input type="hidden" asp-for="Id" />
+        <partial name="_FormularioCliente" for="Entrada" />
+        <div class="botones">
+            <button type="button" class="btn btn-secundario me-auto" data-limpiar>@Iconos.Svg("x") Limpiar campos</button>
+            <a asp-page="Index" class="btn btn-secundario">Cancelar</a>
+            <button type="submit" class="btn btn-primario">@Iconos.Svg("save") Guardar cambios</button>
+        </div>
+    </form>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

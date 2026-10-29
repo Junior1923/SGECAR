@@ -1,0 +1,33 @@
+@* Campos del cliente: los comparten Crear y Editar *@
+@model SGECAR.App.Pages.Clientes.DatosCliente
+
+<div class="row g-3">
+    <div class="col-md-6 campo">
+        <label asp-for="Nombre"></label>
+        <input asp-for="Nombre" class="entrada" maxlength="100" autofocus />
+        <span asp-validation-for="Nombre" class="error-campo"></span>
+    </div>
+    <div class="col-md-6 campo">
+        <label asp-for="Apellido"></label>
+        <input asp-for="Apellido" class="entrada" maxlength="100" />
+        <span asp-validation-for="Apellido" class="error-campo"></span>
+    </div>
+    <div class="col-md-6 campo">
+        <label asp-for="Telefono"></label>
+        <input asp-for="Telefono" type="tel" class="entrada" maxlength="20" placeholder="809-555-0101" />
+        <small class="ayuda">Opcional.</small>
+        <span asp-validation-for="Telefono" class="error-campo"></span>
+    </div>
+    <div class="col-md-6 campo">
+        <label asp-for="Correo"></label>
+        <input asp-for="Correo" type="email" class="entrada" maxlength="254" placeholder="nombre@correo.com" />
+        <small class="ayuda">No se puede repetir.</small>
+        <span asp-validation-for="Correo" class="error-campo"></span>
+    </div>
+    <div class="col-12 campo">
+        <label asp-for="Direccion"></label>
+        <input asp-for="Direccion" class="entrada" maxlength="250" placeholder="Ciudad, sector o calle" />
+        <small class="ayuda">Opcional.</small>
+        <span asp-validation-for="Direccion" class="error-campo"></span>
+    </div>
+</div>
