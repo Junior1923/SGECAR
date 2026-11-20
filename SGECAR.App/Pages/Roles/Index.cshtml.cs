@@ -20,6 +20,14 @@ public class IndexModel : PaginaProtegida
     // Solo entra quien puede crear roles (Administrador)
     protected override string? AccionRequerida => Acciones.CrearRoles;
 
+    // Buscador: nombre del rol, permiso que debe tener y tipo (del sistema o creado)
+    [BindProperty(SupportsGet = true)] public string? Buscar { get; set; }
+    [BindProperty(SupportsGet = true)] public int? ConPermiso { get; set; }
+    [BindProperty(SupportsGet = true)] public string? Tipo { get; set; }
+
+    public bool HayFiltros => !string.IsNullOrWhiteSpace(Buscar) || ConPermiso.HasValue || !string.IsNullOrWhiteSpace(Tipo);
+    public int TotalRoles { get; private set; }
+
     public List<RolDto> Roles { get; private set; } = new();
     public List<PermisoDto> Permisos { get; private set; } = new();
 
@@ -71,7 +79,21 @@ public class IndexModel : PaginaProtegida
         error = ManejarErrorApi(permisos);
         if (error is not null) return error;
 
-        Roles = roles.Datos ?? new();
+        var todos = roles.Datos ?? new();
+        TotalRoles = todos.Count;
+
+        // Consulta dinámica: solo se aplican los filtros que se llenaron
+        IEnumerable<RolDto> consulta = todos;
+        if (!string.IsNullOrWhiteSpace(Buscar))
+            consulta = consulta.Where(r => r.Nombre.Contains(Buscar.Trim(), StringComparison.OrdinalIgnoreCase));
+        if (ConPermiso.HasValue)
+            consulta = consulta.Where(r => r.Permisos.Any(p => p.PermisoId == ConPermiso.Value));
+        if (Tipo == "sistema")
+            consulta = consulta.Where(r => r.EsSistema);
+        else if (Tipo == "personalizado")
+            consulta = consulta.Where(r => !r.EsSistema);
+        Roles = consulta.ToList();
+
         Permisos = (permisos.Datos ?? new()).OrderBy(p => p.PermisoId).ToList();
         return null;
     }

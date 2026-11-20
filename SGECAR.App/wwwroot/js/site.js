@@ -23,6 +23,17 @@ document.addEventListener("DOMContentLoaded", function () {
         jQuery("form select, form input").on("change", function () { jQuery(this).valid(); });
     }
 
+    // Botón de modo oscuro: cambia el tema y lo recuerda para la próxima vez
+    document.querySelectorAll("[data-cambiar-tema]").forEach(function (boton) {
+        boton.addEventListener("click", function () {
+            var raiz = document.documentElement;
+            var oscuro = raiz.getAttribute("data-tema") !== "oscuro";
+            if (oscuro) raiz.setAttribute("data-tema", "oscuro");
+            else raiz.removeAttribute("data-tema");
+            try { localStorage.setItem("sgecar-tema", oscuro ? "oscuro" : "claro"); } catch (e) { }
+        });
+    });
+
     // Botón "Limpiar campos": vacía el formulario y quita los mensajes de error
     document.querySelectorAll("[data-limpiar]").forEach(function (boton) {
         boton.addEventListener("click", function () {

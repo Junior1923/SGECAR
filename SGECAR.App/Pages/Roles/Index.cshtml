@@ -15,6 +15,29 @@
 <div class="row g-4">
     <div class="col-xl-8">
         <div class="panel">
+            <form method="get" class="panel-filtros filtros-compactos">
+                <div class="entrada-grupo flex-grow-1">
+                    @Iconos.Svg("search")
+                    <input type="search" name="buscar" value="@Model.Buscar" class="entrada" placeholder="Buscar rol por nombre..." maxlength="50" />
+                </div>
+                <select name="conPermiso" class="entrada selector" onchange="this.form.submit()">
+                    <option value="">Cualquier permiso</option>
+                    @foreach (var p in Model.Permisos)
+                    {
+                        <option value="@p.PermisoId" selected="@(Model.ConPermiso == p.PermisoId)">@NombresPermiso.Descripcion(p.Nombre)</option>
+                    }
+                </select>
+                <select name="tipo" class="entrada selector" onchange="this.form.submit()">
+                    <option value="">Todos los roles</option>
+                    <option value="sistema" selected="@(Model.Tipo == "sistema")">Del sistema</option>
+                    <option value="personalizado" selected="@(Model.Tipo == "personalizado")">Creados</option>
+                </select>
+                <button type="submit" class="btn btn-secundario">Buscar</button>
+                @if (Model.HayFiltros)
+                {
+                    <a asp-page="Index" class="btn btn-secundario">Limpiar</a>
+                }
+            </form>
             <div class="table-responsive">
                 <table class="tabla tabla-roles">
                     <thead>
@@ -27,6 +50,10 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @if (Model.Roles.Count == 0)
+                        {
+                            <tr><td colspan="@(Model.Permisos.Count + 1)" class="tabla-vacia">No se encontraron roles.</td></tr>
+                        }
                         @foreach (var rol in Model.Roles)
                         {
                             <tr>
@@ -52,6 +79,7 @@
                     </tbody>
                 </table>
             </div>
+            <div class="panel-pie">Mostrando @Model.Roles.Count de @Model.TotalRoles rol(es)</div>
         </div>
     </div>
 

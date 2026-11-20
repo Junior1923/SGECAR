@@ -1,0 +1,174 @@
+@page
+@model SGECAR.App.Pages.Dashboard.IndexModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "Dashboard";
+    var inv = CultureInfo.InvariantCulture;
+    var maxValor = Model.PorCategoria.Count == 0 ? 1 : Math.Max(1, Model.PorCategoria.Max(c => c.Valor));
+    var colores = new[] { "var(--acento)", "var(--verde)", "#e9b872", "var(--info)" };
+    var puedeAgregar = Model.Puede(Acciones.Agregar);
+    var puedeModificar = Model.Puede(Acciones.Modificar);
+}
+
+<div class="encabezado">
+    <div>
+        <h1>Dashboard</h1>
+        <p>Resumen para @Model.UsuarioActual.Usuario (@Model.UsuarioActual.Rol) · @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</p>
+    </div>
+    @* Accesos rápidos: cada botón aparece solo si el rol tiene el permiso *@
+    <div class="dash-acciones">
+        @if (Model.Puede(Acciones.CrearUsuarios))
+        {
+            <a asp-page="/Usuarios/Crear" class="btn btn-secundario">@Iconos.Svg("users") Nuevo usuario</a>
+            <a asp-page="/Reportes/Usuarios" class="btn btn-secundario">@Iconos.Svg("grid") Reportes</a>
+        }
+        else if (puedeModificar)
+        {
+            <a asp-page="/Productos/Index" asp-route-existencia="bajo" class="btn btn-secundario">@Iconos.Svg("edit") Revisar stock bajo</a>
+        }
+        @if (puedeAgregar)
+        {
+            <a asp-page="/Clientes/Crear" class="btn btn-secundario">@Iconos.Svg("plus") Registrar cliente</a>
+            <a asp-page="/Productos/Crear" class="btn btn-primario">@Iconos.Svg("plus") Registrar producto</a>
+        }
+    </div>
+</div>
+
+<div class="dash-kpis">
+    <div class="dash-kpi">
+        <div class="dash-kpi-icono">@Iconos.Svg("user-check")</div>
+        <div><span>Clientes</span><strong>@Model.TotalClientes</strong><small>registrados</small></div>
+    </div>
+    <div class="dash-kpi">
+        <div class="dash-kpi-icono">@Iconos.Svg("package")</div>
+        <div><span>Productos</span><strong>@Model.TotalProductos</strong><small>@Model.Unidades.ToString("N0", inv) unidades en stock</small></div>
+    </div>
+    <div class="dash-kpi">
+        <div class="dash-kpi-icono">@Iconos.Svg("bar-chart")</div>
+        <div><span>Valor del inventario</span><strong class="dash-monto">@IndexModel.Moneda(Model.ValorInventario)</strong><small>precio × stock</small></div>
+    </div>
+    @if (Model.VeUsuarios)
+    {
+        <div class="dash-kpi">
+            <div class="dash-kpi-icono">@Iconos.Svg("users")</div>
+            <div><span>Usuarios activos</span><strong>@Model.UsuariosActivos</strong><small>de @Model.TotalUsuarios cuentas</small></div>
+        </div>
+    }
+    else
+    {
+        <div class="dash-kpi dash-kpi-alerta">
+            <div class="dash-kpi-icono">@Iconos.Svg("alert")</div>
+            <div><span>Productos agotados</span><strong>@Model.Agotados</strong><small>sin existencia</small></div>
+        </div>
+    }
+</div>
+
+<div class="dash-fila">
+    <div class="dash-panel">
+        <h2>Valor del inventario por categoría</h2>
+        @if (Model.PorCategoria.Count == 0)
+        {
+            <p class="texto-suave">Todavía no hay productos registrados.</p>
+        }
+        @foreach (var c in Model.PorCategoria)
+        {
+            <div class="dash-barra">
+                <span>@c.Nombre</span>
+                <div class="dash-barra-fondo" title="@c.Productos producto(s), @c.Unidades unidad(es)">
+                    <div class="dash-barra-relleno" style="width:@Math.Max(2, (int)(c.Valor / maxValor * 100))%"></div>
+                </div>
+                <b>@IndexModel.Moneda(c.Valor, "N0")</b>
+            </div>
+        }
+        <small class="texto-suave">@Model.PorCategoria.Count categoría(s) · @Model.TotalProductos producto(s)</small>
+    </div>
+
+    @if (Model.VeUsuarios)
+    {
+        <div class="dash-panel">
+            <h2>Usuarios por rol</h2>
+            @{
+                var total = Math.Max(1, Model.UsuariosPorRol.Sum(r => r.Cantidad));
+                var circunferencia = 2 * Math.PI * 54;
+                double acumulado = 0;
+            }
+            <div class="dash-dona">
+                <svg width="140" height="140" viewBox="0 0 140 140" role="img" aria-label="Usuarios por rol">
+                    <circle cx="70" cy="70" r="54" fill="none" stroke="var(--superficie-2)" stroke-width="20" />
+                    @for (int i = 0; i < Model.UsuariosPorRol.Count; i++)
+                    {
+                        var largo = Model.UsuariosPorRol[i].Cantidad / (double)total * circunferencia;
+                        <circle cx="70" cy="70" r="54" fill="none" stroke="@colores[i % colores.Length]" stroke-width="20"
+                                stroke-dasharray="@largo.ToString(inv) @circunferencia.ToString(inv)"
+                                stroke-dashoffset="@((-acumulado).ToString(inv))" transform="rotate(-90 70 70)" />
+                        acumulado += largo;
+                    }
+                    <text x="70" y="68" text-anchor="middle" font-size="26" font-weight="800" fill="var(--texto)">@Model.TotalUsuarios</text>
+                    <text x="70" y="88" text-anchor="middle" font-size="11" fill="var(--texto-suave)">usuarios</text>
+                </svg>
+                <div class="dash-leyenda">
+                    @for (int i = 0; i < Model.UsuariosPorRol.Count; i++)
+                    {
+                        <div><i style="background:@colores[i % colores.Length]"></i>@Model.UsuariosPorRol[i].Rol <b class="ms-1">@Model.UsuariosPorRol[i].Cantidad</b></div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="dash-panel">
+            <h2>Lo que puede hacer su rol</h2>
+            <div class="dash-permisos">
+                @foreach (var p in Model.PermisosRol)
+                {
+                    <div class="@(p.Tiene ? "" : "no")">
+                        @if (p.Tiene) { <span class="si">@Iconos.Svg("check")</span> } else { <span class="no">@Iconos.Svg("lock")</span> }
+                        @p.Nombre
+                    </div>
+                }
+            </div>
+            <small class="texto-suave d-block mt-3">Los permisos los asigna el administrador.</small>
+        </div>
+    }
+</div>
+
+<div class="dash-fila">
+    <div class="dash-panel">
+        <h2>Últimos clientes registrados</h2>
+        @if (Model.UltimosClientes.Count == 0)
+        {
+            <p class="texto-suave">Todavía no hay clientes registrados.</p>
+        }
+        @foreach (var c in Model.UltimosClientes)
+        {
+            <div class="dash-linea">
+                <span><span class="av">@c.Nombre.Substring(0, 1).ToUpper()</span><strong>@c.Nombre @c.Apellido</strong></span>
+                <span class="texto-suave">@(string.IsNullOrWhiteSpace(c.Direccion) ? c.Correo : c.Direccion)</span>
+            </div>
+        }
+    </div>
+
+    <div class="dash-panel">
+        <h2>Alertas de stock</h2>
+        @if (Model.Alertas.Count == 0)
+        {
+            <p class="texto-suave">Todos los productos tienen más de @IndexModel.StockBajo unidades.</p>
+        }
+        @foreach (var p in Model.Alertas)
+        {
+            <div class="dash-linea">
+                <span><span class="codigo">@p.Codigo</span> @p.Nombre</span>
+                <span class="text-nowrap">
+                    @if (p.Stock == 0) { <span class="estado estado-bloqueado">Agotado</span> }
+                    else { <span class="estado estado-inactivo">Quedan @p.Stock</span> }
+                    @* El supervisor (y el admin) pueden ir directo a reponer el stock *@
+                    @if (puedeModificar)
+                    {
+                        <a asp-page="/Productos/Editar" asp-route-id="@p.ProductoId" class="btn-accion ms-1">@Iconos.Svg("edit") Modificar</a>
+                    }
+                </span>
+            </div>
+        }
+    </div>
+</div>

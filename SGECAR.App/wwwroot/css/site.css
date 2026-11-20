@@ -1,4 +1,4 @@
-/* SGECAR — tema claro, tonos tierra */
+/* SGECAR — tema claro, tonos tierra (al final está el modo oscuro) */
 
 @font-face { font-family: "Plus Jakarta Sans"; font-weight: 400; font-display: swap; src: url("../fonts/plus-jakarta-sans-latin-400-normal.woff2") format("woff2"); }
 @font-face { font-family: "Plus Jakarta Sans"; font-weight: 500; font-display: swap; src: url("../fonts/plus-jakarta-sans-latin-500-normal.woff2") format("woff2"); }
@@ -286,6 +286,102 @@ a { color: var(--acento); }
     .reporte-resumen div, .chip-filtro { border: 1px solid #ccc; }
 }
 
+/* ---------- Filtros de Roles (panel más angosto) ---------- */
+.panel-filtros.filtros-compactos .entrada-grupo { flex: 1 1 150px; min-width: 0; }
+.panel-filtros.filtros-compactos .selector { width: 165px; }
+
+/* ---------- Dashboard ---------- */
+.dash-acciones { display: flex; gap: .5rem; flex-wrap: wrap; }
+.dash-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: .9rem; margin-bottom: 1rem; }
+.dash-kpi { background: var(--superficie); border: 1px solid var(--borde); border-radius: 18px; padding: 1rem 1.2rem; display: flex; gap: .9rem; align-items: center; }
+.dash-kpi-icono { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; background: var(--acento-fondo); color: var(--acento); flex-shrink: 0; }
+.dash-kpi span { display: block; color: var(--texto-suave); font-size: .8rem; font-weight: 600; }
+.dash-kpi strong { display: block; font-size: 1.6rem; font-weight: 800; line-height: 1.15; }
+.dash-kpi .dash-monto { font-size: 1.25rem; }
+.dash-kpi small { display: block; color: var(--texto-tenue); font-size: .75rem; }
+.dash-kpi-alerta .dash-kpi-icono { background: var(--peligro-fondo); color: var(--peligro); }
+.dash-fila { display: grid; grid-template-columns: 1.6fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.dash-panel { background: var(--superficie); border: 1px solid var(--borde); border-radius: 20px; padding: 1.2rem 1.4rem; }
+.dash-panel h2 { font-size: 1rem; font-weight: 800; margin: 0 0 1rem; }
+.dash-barra { display: grid; grid-template-columns: 110px 1fr 120px; align-items: center; gap: .8rem; margin-bottom: .8rem; font-size: .88rem; }
+.dash-barra-fondo { height: 14px; background: var(--superficie-2); border-radius: 99px; overflow: hidden; }
+.dash-barra-relleno { height: 100%; border-radius: 99px; background: var(--acento); }
+.dash-barra b { text-align: right; font-weight: 700; }
+.dash-linea { display: flex; justify-content: space-between; align-items: center; gap: .8rem; padding: .55rem 0; border-top: 1px solid var(--borde); font-size: .88rem; }
+.dash-linea:first-of-type { border-top: 0; }
+.dash-dona { display: flex; align-items: center; gap: 1.4rem; }
+.dash-leyenda div { display: flex; align-items: center; gap: .5rem; font-size: .88rem; margin-bottom: .4rem; }
+.dash-leyenda i { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
+.dash-permisos { display: grid; grid-template-columns: 1fr 1fr; gap: .45rem; }
+.dash-permisos div { display: flex; align-items: center; gap: .5rem; font-size: .88rem; font-weight: 600; background: var(--superficie-2); border-radius: 12px; padding: .5rem .75rem; }
+.dash-permisos .no { opacity: .55; font-weight: 500; }
+@media (max-width: 991px) { .dash-kpis { grid-template-columns: repeat(2, 1fr); } .dash-fila { grid-template-columns: 1fr; } }
+
+/* ---------- Botón de modo oscuro ---------- */
+.btn-tema {
+    margin-left: auto; width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+    display: grid; place-items: center; border: 0;
+    background: var(--superficie-2); color: var(--texto-2); transition: background .15s, color .15s;
+}
+.btn-tema:hover { background: var(--borde-fuerte); color: var(--texto); }
+.btn-tema .ico { width: 19px; height: 19px; }
+.btn-tema .icono-sol, :root[data-tema="oscuro"] .btn-tema .icono-luna { display: none; }
+:root[data-tema="oscuro"] .btn-tema .icono-sol { display: inline; }
+.btn-tema-flotante { position: fixed; top: 1.1rem; right: 1.1rem; z-index: 10; margin: 0; box-shadow: 0 4px 14px rgba(0, 0, 0, .12); }
+
+/* ---------- Modo oscuro ----------
+   Solo se cambian las variables de color; todo el diseño las usa.
+   Abajo se corrigen los pocos colores que estaban escritos directo. */
+:root[data-tema="oscuro"] {
+    color-scheme: dark;
+    --fondo: #171513;
+    --superficie: #211e1b;
+    --superficie-2: #2c2824;
+    --borde: #34302b;
+    --borde-fuerte: #47413a;
+    --texto: #f1ebe4;
+    --texto-2: #d6cdc3;
+    --texto-suave: #a99d92;
+    --texto-tenue: #7e736a;
+    --verde: #3d5446;
+    --acento: #d9774a;
+    --acento-hover: #e88c60;
+    --acento-fondo: #3d2a20;
+    --exito: #7cc49a;
+    --exito-fondo: #1f3328;
+    --peligro: #ec8a63;
+    --peligro-fondo: #3d241a;
+    --aviso: #e6b45c;
+    --aviso-fondo: #3a2e18;
+    --info: #7fb6d6;
+    --info-fondo: #1c2e38;
+}
+:root[data-tema="oscuro"] .usuario-chip:hover,
+:root[data-tema="oscuro"] .usuario-chip[aria-expanded="true"],
+:root[data-tema="oscuro"] .btn-accion:hover { background: #3a352f; }
+:root[data-tema="oscuro"] .tabla td { border-top-color: var(--borde); }
+:root[data-tema="oscuro"] .tabla tbody tr:hover td { background: #26231f; }
+:root[data-tema="oscuro"] .casilla:has(input:checked) { background: #24302a; }
+:root[data-tema="oscuro"] .btn-accion-peligro:hover { background: #4a2c20; }
+:root[data-tema="oscuro"] .btn-accion-exito:hover { background: #26402f; }
+:root[data-tema="oscuro"] .reporte { background: var(--superficie); }
+:root[data-tema="oscuro"] .dropdown-menu,
+:root[data-tema="oscuro"] .msgbox { box-shadow: 0 20px 50px rgba(0, 0, 0, .55); }
+:root[data-tema="oscuro"] .modal-backdrop.show { opacity: .7; }
+:root[data-tema="oscuro"] .selector {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a99d92' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+}
+:root[data-tema="oscuro"] .entrada option { background: var(--superficie); color: var(--texto); }
+
+/* El reporte siempre se imprime en claro, aunque la pantalla esté en oscuro */
+@media print {
+    :root[data-tema="oscuro"] {
+        color-scheme: light;
+        --fondo: #fff; --superficie: #fff; --superficie-2: #f3ece4; --borde: #ece4da; --borde-fuerte: #ddd2c5;
+        --texto: #2a2420; --texto-2: #5a4f48; --texto-suave: #7d7068; --texto-tenue: #a59a90; --verde: #2f3e36;
+    }
+}
+
 /* ---------- Pantallas pequeñas ---------- */
 @media (max-width: 991px) {
     .cuenta-contenedor { grid-template-columns: 1fr; }
@@ -303,5 +399,6 @@ a { color: var(--acento); }
     .principal { padding: 1.4rem 1rem 2rem; }
     .usuario-datos { display: none; }
     .panel-filtros .selector { width: 100%; }
+    .btn-tema { margin-left: auto; }
     .encabezado h1 { font-size: 1.7rem; }
 }

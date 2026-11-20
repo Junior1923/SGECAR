@@ -13,6 +13,7 @@
     <title>@ViewData["Title"] · SGECAR</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script src="~/js/tema.js" asp-append-version="true"></script>
 </head>
 <body class="app">
     <header class="cabecera no-imprimir">
@@ -26,6 +27,7 @@
                 <a asp-page="/Menu/Index" class="opcion @Activo("/Menu")">@Iconos.Svg("home") <span>Inicio</span></a>
                 @if (Puede(Acciones.Consultar))
                 {
+                    <a asp-page="/Dashboard/Index" class="opcion @Activo("/Dashboard")">@Iconos.Svg("bar-chart") <span>Dashboard</span></a>
                     <a asp-page="/Clientes/Index" class="opcion @Activo("/Clientes")">@Iconos.Svg("user-check") <span>Clientes</span></a>
                     <a asp-page="/Productos/Index" class="opcion @Activo("/Productos")">@Iconos.Svg("package") <span>Productos</span></a>
                 }
@@ -44,9 +46,13 @@
                 @* Etapa III: agregar aquí las opciones de los nuevos módulos *@
             </div>
 
+            <button type="button" class="btn-tema" data-cambiar-tema title="Cambiar entre modo claro y oscuro" aria-label="Cambiar entre modo claro y oscuro">
+                <span class="icono-luna">@Iconos.Svg("moon")</span><span class="icono-sol">@Iconos.Svg("sun")</span>
+            </button>
+
             @if (usuario is not null)
             {
-                <div class="dropdown ms-auto">
+                <div class="dropdown">
                     <button class="usuario-chip" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <span class="av">@usuario.Usuario.Substring(0, 1).ToUpper()</span>
                         <span class="usuario-datos">

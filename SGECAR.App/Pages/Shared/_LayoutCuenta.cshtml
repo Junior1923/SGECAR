@@ -7,8 +7,12 @@
     <title>@ViewData["Title"] · SGECAR</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script src="~/js/tema.js" asp-append-version="true"></script>
 </head>
 <body class="cuenta">
+    <button type="button" class="btn-tema btn-tema-flotante" data-cambiar-tema title="Cambiar entre modo claro y oscuro" aria-label="Cambiar entre modo claro y oscuro">
+        <span class="icono-luna">@Iconos.Svg("moon")</span><span class="icono-sol">@Iconos.Svg("sun")</span>
+    </button>
     <div class="cuenta-contenedor">
         <aside class="cuenta-arte" aria-hidden="true">
             <span class="forma forma-1"></span>

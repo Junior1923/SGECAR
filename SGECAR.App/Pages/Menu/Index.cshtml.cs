@@ -14,6 +14,7 @@ public class IndexModel : PaginaProtegida
         // Los módulos de la etapa III se agregan a esta lista
         Modulos = new()
         {
+            new("Dashboard", "Resumen de clientes, productos e inventario", "bar-chart", "/Dashboard/Index", Puede(Acciones.Consultar)),
             new("Clientes", "Registrar, modificar, eliminar y consultar clientes", "user-check", "/Clientes/Index", Puede(Acciones.Consultar)),
             new("Productos", "Inventario de productos por categoría", "package", "/Productos/Index", Puede(Acciones.Consultar)),
             new("Usuarios", "Crear, modificar y eliminar cuentas de acceso", "users", "/Usuarios/Index", Puede(Acciones.CrearUsuarios)),
